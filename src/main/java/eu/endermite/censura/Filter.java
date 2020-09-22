@@ -71,7 +71,17 @@ public class Filter {
             return true;
         }
 
+        if (detectPhrases(noRepeatChars(string), "severe")) {
+            doActions(Censura.getCachedConfig().getSeverePunishments(), player);
+            return true;
+        }
+
         if (detectPhrases(string, "normal")) {
+            doActions(Censura.getCachedConfig().getNormalPunishments(), player);
+            return true;
+        }
+
+        if (detectPhrases(noRepeatChars(string), "normal")) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
@@ -80,7 +90,27 @@ public class Filter {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
+
+        if (detectPhrases(noRepeatChars(string), "lite")) {
+            doActions(Censura.getCachedConfig().getLitePunishments(), player);
+            return true;
+        }
         return false;
+    }
+
+    private static String noRepeatChars(String string) {
+        char[] chars;
+        chars = string.toCharArray();
+        StringBuilder result = new StringBuilder();
+        char lastChar = ' ';
+        for (char c : chars) {
+            if (lastChar == c)
+                continue;
+
+            lastChar = c;
+            result.append(c);
+        }
+        return result.toString();
     }
 
     public static void doActions(List<String> actions, Player player) {
