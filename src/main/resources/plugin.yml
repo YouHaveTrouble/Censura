@@ -1,0 +1,16 @@
+name: Censura
+version: ${project.version}
+main: eu.endermite.censura.Censura
+api-version: 1.13
+authors: [ YouHaveTrouble ]
+description: Censor everything you want
+commands:
+  censura:
+    description: Main command for Censura
+permissions:
+  censura.reload:
+    default: op
+    description: Allows usage of /censura reload command
+  censura.bypass:
+    default: false
+    description: Allows to bypass filters of Censura

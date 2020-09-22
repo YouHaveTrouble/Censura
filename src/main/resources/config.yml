@@ -1,0 +1,70 @@
+
+# Exceptions are filtered >>before<< the match filters to make sure there are no false positives.
+
+# Each "action" list is unlimited and can have as many actions as you want
+# Possible "action" types:
+# "message: <message>" - sends a message to player who triggered the filter
+# "command: <command>" - executes command as console.
+
+# Placeholder available for all actions:
+# %player% - name of the player who triggered the filter
+
+
+# Should server operators bypass the filters?
+op-bypass: true
+
+# Commands of which arguments should be checked.
+# It's recommended to list all private message commands and their aliases
+# and every command that allows changing item name and etc.
+filtered-commands:
+  - msg
+  - w
+  - say
+  - me
+
+filter:
+  # Light filter. This one is checked LAST
+  light:
+    action:
+      - "message: Censura - Stop using bad words, %player%!"
+    match:
+      sex:
+        exceptions: []
+      porn:
+        exceptions: []
+
+  # Normal filter. This one is checked AFTER severe.
+  normal:
+    action:
+      - "command: kick %player% Censura - Stop using curse words!"
+    match:
+      fuck:
+        exceptions: []
+      faggot:
+        exceptions: []
+
+  # Severe filter. This one is checked FIRST.
+  severe:
+    action:
+      - "command: ban %player% Censura - Using offensive words."
+    match:
+      nigg:
+        exceptions:
+          - snigg
+          - niggard
+      niga:
+        exceptions:
+          - nigahiga
+      niba:
+        exceptions:
+          - annibal
+          - miniba
+      nibb:
+        exceptions:
+          - nibbl
+          - snibbi
+
+messages:
+  no-permission: "Censura - &cYou don't have permission to do this."
+  no-such-command: "Censura - &cThere is no such command."
+  config-reloaded: "Censura - &aConfiguration reloaded."
