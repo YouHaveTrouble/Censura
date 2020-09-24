@@ -13,12 +13,14 @@ public class SignChangeListener implements Listener {
     public void onSignChangeEvent(org.bukkit.event.block.SignChangeEvent event) {
         Player player = event.getPlayer();
 
+        StringBuilder signContent = new StringBuilder();
         for (String line : event.getLines()) {
-            if (Filter.filter(line, player)) {
-                event.setCancelled(true);
-                return;
-            }
+            signContent.append(line).append(" ");
         }
+
+        if (Filter.filter(signContent.toString(), player))
+            event.setCancelled(true);
+
     }
 
 }
