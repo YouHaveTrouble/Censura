@@ -10,14 +10,11 @@ public class CommandListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInteractEvent(org.bukkit.event.player.PlayerCommandPreprocessEvent event) {
-
         String msg = event.getMessage().toLowerCase();
         for (String cmd : Censura.getCachedConfig().getCommandsToFilter()) {
-            if (msg.startsWith("/" + cmd + " ") && Filter.filter(msg, event.getPlayer())) {
+            if (msg.startsWith("/" + cmd + " ") && Filter.filter(msg, event.getPlayer()))
                 event.setCancelled(true);
-            }
         }
     }
-
 }
 

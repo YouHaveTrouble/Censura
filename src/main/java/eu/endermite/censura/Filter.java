@@ -4,8 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Filter {
 
@@ -39,19 +40,22 @@ public class Filter {
             exceptions = Censura.getCachedConfig().getSevereExceptions();
             matches = Censura.getCachedConfig().getSevereMatches();
         }
-        if (exceptions == null || matches == null) {
+        if (matches == null) {
             return false;
         }
-        for (String exception : exceptions) {
-            if (string.contains(exception)) {
+
+        try {
+            for (String exception : exceptions) {
                 string = string.replaceAll(exception, "*");
             }
-        }
+        } catch (NullPointerException ignored) {}
+
         for (String match : matches) {
-            if (string.contains(match)) {
+            Matcher m = Pattern.compile(match).matcher(string);
+            if (m.find())
                 return true;
-            }
         }
+
         return false;
     }
 
@@ -64,34 +68,32 @@ public class Filter {
             return false;
         }
 
-        String string = normalizedString(message);
-
-        if (detectPhrases(string, "severe")) {
+        if (detectPhrases(message, "severe") || detectPhrases(normalizedString(message), "severe")) {
             doActions(Censura.getCachedConfig().getSeverePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(string), "severe")) {
+        if (detectPhrases(noRepeatChars(message), "severe") || detectPhrases(noRepeatChars(normalizedString(message)), "severe")) {
             doActions(Censura.getCachedConfig().getSeverePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(string, "normal")) {
+        if (detectPhrases(message, "normal") || detectPhrases(normalizedString(message), "normal")) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(string), "normal")) {
+        if (detectPhrases(noRepeatChars(message), "normal") || detectPhrases(noRepeatChars(normalizedString(message)), "normal")) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
 
-        if (detectPhrases(string, "lite")) {
+        if (detectPhrases(message, "lite") || detectPhrases(normalizedString(message), "lite")) {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(string), "lite")) {
+        if (detectPhrases(noRepeatChars(message), "lite") || detectPhrases(noRepeatChars(normalizedString(message)), "lite")) {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
@@ -106,7 +108,6 @@ public class Filter {
         for (char c : chars) {
             if (lastChar == c)
                 continue;
-
             lastChar = c;
             result.append(c);
         }

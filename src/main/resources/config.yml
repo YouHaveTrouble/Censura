@@ -53,6 +53,8 @@ filter:
       niga:
         exceptions:
           - nigahiga
+          - nigard
+          - snig
       niba:
         exceptions:
           - annibal

@@ -10,7 +10,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 
 
-public class PrepareAnvilListener implements Listener {
+public class ItemRenameListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInteractEvent(org.bukkit.event.inventory.InventoryClickEvent event) {

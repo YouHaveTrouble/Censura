@@ -6,19 +6,19 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-
 public class SignChangeListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSignChangeEvent(org.bukkit.event.block.SignChangeEvent event) {
         Player player = event.getPlayer();
 
-        for (String line : event.getLines()) {
-            if (Filter.filter(line, player)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+        StringBuilder signContent = new StringBuilder();
+        for (String line : event.getLines())
+            signContent.append(line).append(" ");
+
+        if (Filter.filter(signContent.toString(), player))
+            event.setCancelled(true);
+
     }
 
 }
