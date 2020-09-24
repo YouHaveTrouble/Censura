@@ -24,6 +24,7 @@ public class Filter {
         message = message.replaceAll("\\$", "s");
         message = message.replaceAll("@", "a");
         message = message.replaceAll("/[^A-Za-z]/g", "");
+        message = message.replaceAll(" ", "");
         return message;
     }
 
