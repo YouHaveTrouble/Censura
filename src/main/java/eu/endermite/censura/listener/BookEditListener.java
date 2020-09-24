@@ -10,13 +10,9 @@ public class BookEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChatEvent(org.bukkit.event.player.PlayerEditBookEvent event) {
-
-        if (event.getPreviousBookMeta() == event.getNewBookMeta()) {
+        if (event.getPreviousBookMeta() == event.getNewBookMeta())
             return;
-        }
-
         BookMeta bookMeta = event.getNewBookMeta();
-
         try {
             for (String page : bookMeta.getPages()) {
                 if (Filter.filter(page, event.getPlayer())) {
@@ -24,13 +20,9 @@ public class BookEditListener implements Listener {
                 }
             }
         } catch (NullPointerException ignored) {}
-
-        if (event.isSigning()) {
-            if (Filter.filter(event.getNewBookMeta().getTitle(), event.getPlayer())) {
-                event.setCancelled(true);
-            }
-        }
-
+        if (!event.isSigning())
+            return;
+        if (Filter.filter(event.getNewBookMeta().getTitle(), event.getPlayer()))
+            event.setCancelled(true);
     }
-
 }

@@ -20,7 +20,7 @@ public final class Censura extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatEventListener(), this);
         getServer().getPluginManager().registerEvents(new SignChangeListener(), this);
         getServer().getPluginManager().registerEvents(new BookEditListener(), this);
-        getServer().getPluginManager().registerEvents(new PrepareAnvilListener(), this);
+        getServer().getPluginManager().registerEvents(new ItemRenameListener(), this);
         getServer().getPluginManager().registerEvents(new CommandListener(), this);
 
         try {

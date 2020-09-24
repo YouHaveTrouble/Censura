@@ -1,12 +1,10 @@
 package eu.endermite.censura.command;
 
 import eu.endermite.censura.Censura;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.PluginDescriptionFile;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
