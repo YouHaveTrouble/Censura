@@ -8,7 +8,9 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CensuraCommand implements TabExecutor {
 
@@ -32,15 +34,15 @@ public class CensuraCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> allSubCommands = new ArrayList<>();
+        HashMap<String, String> allSubCommands = new HashMap<>();
         List<String> result = new ArrayList<>();
 
-        allSubCommands.add("reload");
+        allSubCommands.put("reload", "censura.reload");
 
         if (args.length == 1) {
-            for (String sub : allSubCommands) {
-                if (sub.startsWith(args[0].toLowerCase()))
-                    result.add(sub);
+            for (Map.Entry<String, String> sub : allSubCommands.entrySet()) {
+                if (sub.getKey().startsWith(args[0].toLowerCase()) && sender.hasPermission(sub.getValue()))
+                    result.add(sub.getKey());
             }
         }
         return result;
