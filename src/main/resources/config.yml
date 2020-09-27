@@ -69,3 +69,4 @@ messages:
   no-permission: "Censura - &cYou don't have permission to do this."
   no-such-command: "Censura - &cThere is no such command."
   config-reloaded: "Censura - &aConfiguration reloaded."
+  kick-bad-name: "Censura\n&cYour name contains bad words!"

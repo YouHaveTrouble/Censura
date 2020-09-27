@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,6 +99,35 @@ public class Filter {
             return true;
         }
         return false;
+    }
+
+    public static boolean filterNoActions(String message) {
+
+        if (detectPhrases(message, "severe") || detectPhrases(normalizedString(message), "severe")) {
+            return true;
+        }
+
+        if (detectPhrases(noRepeatChars(message), "severe") || detectPhrases(noRepeatChars(normalizedString(message)), "severe")) {
+            return true;
+        }
+
+        if (detectPhrases(message, "normal") || detectPhrases(normalizedString(message), "normal")) {
+            return true;
+        }
+
+        if (detectPhrases(noRepeatChars(message), "normal") || detectPhrases(noRepeatChars(normalizedString(message)), "normal")) {
+            return true;
+        }
+
+        if (detectPhrases(message, "lite") || detectPhrases(normalizedString(message), "lite")) {
+            return true;
+        }
+
+        if (detectPhrases(noRepeatChars(message), "lite") || detectPhrases(noRepeatChars(normalizedString(message)), "lite")) {
+            return true;
+        }
+        return false;
+
     }
 
     private static String noRepeatChars(String string) {

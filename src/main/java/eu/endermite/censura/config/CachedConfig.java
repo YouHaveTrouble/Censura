@@ -24,7 +24,7 @@ public class CachedConfig {
 
     List<String> commandsToFilter = new ArrayList<>();
 
-    String noPermission, noSuchCommand, configReloaded;
+    String noPermission, noSuchCommand, configReloaded, kickBadName;
     boolean opBypass;
 
     public CachedConfig(FileConfiguration config) {
@@ -85,6 +85,7 @@ public class CachedConfig {
         noPermission = messages.getString("no-permission");
         noSuchCommand = messages.getString("no-such-command");
         configReloaded = messages.getString("config-reloaded");
+        kickBadName = messages.getString("kick-bad-name");
 
 
     }
@@ -139,6 +140,10 @@ public class CachedConfig {
 
     public String getConfigReloaded() {
         return ChatColor.translateAlternateColorCodes('&', configReloaded);
+    }
+
+    public String getKickBadName() {
+        return ChatColor.translateAlternateColorCodes('&', kickBadName);
     }
 
     public boolean getOpBypass() {
