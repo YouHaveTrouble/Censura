@@ -22,6 +22,8 @@ public final class Censura extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BookEditListener(), this);
         getServer().getPluginManager().registerEvents(new ItemRenameListener(), this);
         getServer().getPluginManager().registerEvents(new CommandListener(), this);
+        getServer().getPluginManager().registerEvents(new EntityRenameListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 
         try {
             getCommand("censura").setExecutor(new CensuraCommand());
