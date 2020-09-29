@@ -25,7 +25,7 @@ public class CachedConfig {
     List<String> commandsToFilter = new ArrayList<>();
 
     String noPermission, noSuchCommand, configReloaded, kickBadName;
-    boolean opBypass;
+    boolean opBypass, kickOnJoin;
 
     public CachedConfig(FileConfiguration config) {
 
@@ -37,7 +37,6 @@ public class CachedConfig {
         }
 
         litePunishments = lite.getStringList("action");
-
 
         ConfigurationSection liteMatch = lite.getConfigurationSection("match");
 
@@ -79,14 +78,14 @@ public class CachedConfig {
         }
 
         commandsToFilter.addAll(config.getStringList("filtered-commands"));
-        opBypass = config.getBoolean("op-bypass");
+        opBypass = config.getBoolean("op-bypass", true);
+        kickOnJoin = config.getBoolean("kick-on-bad-name", true);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
-        noPermission = messages.getString("no-permission");
-        noSuchCommand = messages.getString("no-such-command");
-        configReloaded = messages.getString("config-reloaded");
-        kickBadName = messages.getString("kick-bad-name");
-
+        noPermission = messages.getString("no-permission", "Censura - &cYou don't have permission to do this.");
+        noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
+        configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
+        kickBadName = messages.getString("kick-bad-name", "Censura\n&cYour name contains bad words!");
 
     }
 
@@ -148,6 +147,10 @@ public class CachedConfig {
 
     public boolean getOpBypass() {
         return opBypass;
+    }
+
+    public boolean getKickOnJoin() {
+        return kickOnJoin;
     }
 
 }

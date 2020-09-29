@@ -14,18 +14,19 @@ public class CensuraCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length > 0) {
-            if (args[0].equalsIgnoreCase("reload")) {
-                if (sender.hasPermission("censura.reload")) {
-                    Censura.getPlugin().asyncReloadConfigCache(sender);
-                } else {
-                    sender.sendMessage(Censura.getCachedConfig().getNoPermission());
-                }
+        if (args.length == 0) {
+            sendCredits(sender);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("reload")) {
+            if (sender.hasPermission("censura.reload")) {
+                Censura.getPlugin().asyncReloadConfigCache(sender);
             } else {
-                sender.sendMessage(Censura.getCachedConfig().getNoSuchCommand());
+                sender.sendMessage(Censura.getCachedConfig().getNoPermission());
             }
         } else {
-            sendCredits(sender);
+            sender.sendMessage(Censura.getCachedConfig().getNoSuchCommand());
         }
         return true;
     }
@@ -48,7 +49,7 @@ public class CensuraCommand implements TabExecutor {
 
     public void sendCredits(CommandSender sender) {
         PluginDescriptionFile desc = Censura.getPlugin().getDescription();
-        sender.sendMessage("Censura "+ desc.getVersion()+ " by YouHaveTrouble");
+        sender.sendMessage("Censura " + desc.getVersion() + " by YouHaveTrouble");
         assert desc.getDescription() != null;
         sender.sendMessage(desc.getDescription());
     }

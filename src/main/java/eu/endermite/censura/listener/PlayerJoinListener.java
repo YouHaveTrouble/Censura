@@ -11,6 +11,10 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerJoin(org.bukkit.event.player.AsyncPlayerPreLoginEvent event) {
+
+        if (!Censura.getCachedConfig().getKickOnJoin())
+            return;
+
         String name = event.getPlayerProfile().getName();
         if (Filter.filterNoActions(name)) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Censura.getCachedConfig().getKickBadName());
