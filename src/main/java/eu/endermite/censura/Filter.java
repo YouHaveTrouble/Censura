@@ -96,7 +96,7 @@ public class Filter {
                 if (isSpacer(c)) {
                     return true; //We've reached the end and reached a spacer
                 }
-            } else if (c == detectChars[state]) {
+            } else if (match(c, detectChars[state])) {
                 if (state == 0) {
                     //Can only match the first letter of the snippet after a space
                     if (wasSpacer) state++;
@@ -104,7 +104,7 @@ public class Filter {
                     state++;
                 }
             }
-            if (state > 0 && c != detectChars[state-1] && !isSpacer(c)) {
+            if (state > 0 && !match(c,detectChars[state-1]) && !isSpacer(c)) {
                 //This is not a repeated character. We should reset
                 state = 0;
             }
@@ -119,6 +119,11 @@ public class Filter {
 
     private static boolean isSpacer(char c) {
         return !Character.isAlphabetic(c);
+    }
+
+    private static boolean match(char a, char b) {
+        if (b == '*') return true;
+        return a == b;
     }
 
     public static boolean detect(String message, FilterStrength mode) {
