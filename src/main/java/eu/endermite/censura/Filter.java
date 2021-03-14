@@ -66,10 +66,10 @@ public class Filter {
     }
 
     public static boolean detect(String message, FilterStrength mode) {
-        return detectPhrases(message, FilterStrength.SEVERE) ||
-                detectPhrases(normalizedString(message), FilterStrength.SEVERE) ||
-                detectPhrases(noRepeatChars(message), FilterStrength.SEVERE) ||
-                detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.SEVERE);
+        return detectPhrases(message, mode) ||
+                detectPhrases(normalizedString(message), mode) ||
+                detectPhrases(noRepeatChars(message), mode) ||
+                detectPhrases(noRepeatChars(normalizedString(message)), mode);
     }
 
     public static boolean filter(String message, Player player) {
