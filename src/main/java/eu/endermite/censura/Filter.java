@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +14,9 @@ public class Filter {
 
     public static String normalizedString(String string) {
         String message = string.toLowerCase();
+        message = Normalizer.normalize(message, Normalizer.Form.NFD);
         message = ChatColor.stripColor(message);
+        message = message.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
         message = message.replaceAll("0", "o");
         message = message.replaceAll("1", "i");
         message = message.replaceAll("3", "e");
@@ -22,8 +26,7 @@ public class Filter {
         message = message.replaceAll("9", "g");
         message = message.replaceAll("\\$", "s");
         message = message.replaceAll("@", "a");
-        message = message.replaceAll("/[^A-Za-z]/g", "");
-        message = message.replaceAll(" ", "");
+        message = message.replaceAll("\\W+(\\w)((\\W+(?=\\w\\w))|(?!\\w))", "$1");
         return message;
     }
 
