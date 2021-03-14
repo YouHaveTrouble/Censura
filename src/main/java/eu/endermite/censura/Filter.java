@@ -27,19 +27,25 @@ public class Filter {
         return message;
     }
 
-    public static boolean detectPhrases(String string, String mode) {
+    public static boolean detectPhrases(String string, FilterStrength mode) {
         List<String> exceptions = null;
         List<String> matches = null;
-        if (mode.equalsIgnoreCase("lite")) {
-            exceptions = Censura.getCachedConfig().getLiteExceptions();
-            matches = Censura.getCachedConfig().getLiteMatches();
-        } else if (mode.equalsIgnoreCase("normal")) {
-            exceptions = Censura.getCachedConfig().getNormalExceptions();
-            matches = Censura.getCachedConfig().getNormalMatches();
-        } else if (mode.equalsIgnoreCase("severe")) {
-            exceptions = Censura.getCachedConfig().getSevereExceptions();
-            matches = Censura.getCachedConfig().getSevereMatches();
+
+        switch (mode) {
+            case SEVERE:
+                exceptions = Censura.getCachedConfig().getSevereExceptions();
+                matches = Censura.getCachedConfig().getSevereMatches();
+                break;
+            case NORMAL:
+                exceptions = Censura.getCachedConfig().getNormalExceptions();
+                matches = Censura.getCachedConfig().getNormalMatches();
+                break;
+            case LITE:
+                exceptions = Censura.getCachedConfig().getLiteExceptions();
+                matches = Censura.getCachedConfig().getLiteMatches();
+                break;
         }
+
         if (matches == null) {
             return false;
         }
@@ -68,32 +74,32 @@ public class Filter {
             return false;
         }
 
-        if (detectPhrases(message, "severe") || detectPhrases(normalizedString(message), "severe")) {
+        if (detectPhrases(message, FilterStrength.SEVERE) || detectPhrases(normalizedString(message), FilterStrength.SEVERE)) {
             doActions(Censura.getCachedConfig().getSeverePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "severe") || detectPhrases(noRepeatChars(normalizedString(message)), "severe")) {
+        if (detectPhrases(noRepeatChars(message), FilterStrength.SEVERE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.SEVERE)) {
             doActions(Censura.getCachedConfig().getSeverePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(message, "normal") || detectPhrases(normalizedString(message), "normal")) {
+        if (detectPhrases(message, FilterStrength.NORMAL) || detectPhrases(normalizedString(message), FilterStrength.NORMAL)) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "normal") || detectPhrases(noRepeatChars(normalizedString(message)), "normal")) {
+        if (detectPhrases(noRepeatChars(message), FilterStrength.NORMAL) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.NORMAL)) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
 
-        if (detectPhrases(message, "lite") || detectPhrases(normalizedString(message), "lite")) {
+        if (detectPhrases(message, FilterStrength.LITE) || detectPhrases(normalizedString(message), FilterStrength.LITE)) {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "lite") || detectPhrases(noRepeatChars(normalizedString(message)), "lite")) {
+        if (detectPhrases(noRepeatChars(message), FilterStrength.LITE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.LITE)) {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
@@ -102,27 +108,27 @@ public class Filter {
 
     public static boolean filterNoActions(String message) {
 
-        if (detectPhrases(message, "severe") || detectPhrases(normalizedString(message), "severe")) {
+        if (detectPhrases(message, FilterStrength.SEVERE) || detectPhrases(normalizedString(message), FilterStrength.SEVERE)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "severe") || detectPhrases(noRepeatChars(normalizedString(message)), "severe")) {
+        if (detectPhrases(noRepeatChars(message), FilterStrength.SEVERE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.SEVERE)) {
             return true;
         }
 
-        if (detectPhrases(message, "normal") || detectPhrases(normalizedString(message), "normal")) {
+        if (detectPhrases(message, FilterStrength.NORMAL) || detectPhrases(normalizedString(message), FilterStrength.NORMAL)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "normal") || detectPhrases(noRepeatChars(normalizedString(message)), "normal")) {
+        if (detectPhrases(noRepeatChars(message), FilterStrength.NORMAL) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.NORMAL)) {
             return true;
         }
 
-        if (detectPhrases(message, "lite") || detectPhrases(normalizedString(message), "lite")) {
+        if (detectPhrases(message, FilterStrength.LITE) || detectPhrases(normalizedString(message), FilterStrength.LITE)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "lite") || detectPhrases(noRepeatChars(normalizedString(message)), "lite")) {
+        if (detectPhrases(noRepeatChars(message), FilterStrength.LITE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.LITE)) {
             return true;
         }
         return false;
@@ -158,4 +164,9 @@ public class Filter {
         }
     }
 
+    public enum FilterStrength {
+        SEVERE,
+        NORMAL,
+        LITE
+    }
 }
