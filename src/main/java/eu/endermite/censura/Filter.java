@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class Filter {
     private static final Pattern diacreticMarks = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-    private static final Pattern singleLetterSurroundedBySpacers = Pattern.compile("\\W+(\\w)((\\W+(?=\\w\\w))|(?!\\w))");
+    private static final Pattern singleLetterSurroundedBySpacers = Pattern.compile("^(\\w)\\W+(?=\\w\\w)|\\W+(\\w)((\\W+(?=\\w\\w))|(?!\\w))");
 
     public static String normalizedString(String string) {
         String message = string.toLowerCase();
@@ -28,7 +28,7 @@ public class Filter {
         message = message.replace('9', 'g');
         message = message.replace('$', 's');
         message = message.replace('@', 'a');
-        message = singleLetterSurroundedBySpacers.matcher(message).replaceAll("$1");
+        message = singleLetterSurroundedBySpacers.matcher(message).replaceAll("$1$2");
         return message;
     }
 
