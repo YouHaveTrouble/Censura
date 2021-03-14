@@ -4,26 +4,31 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Filter {
+    private static final Pattern diacreticMarks = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    private static final Pattern singleLetterSurroundedBySpacers = Pattern.compile("^(\\w)\\W+(?=\\w\\w)|\\W+(\\w)((\\W+(?=\\w\\w))|(?!\\w))");
 
     public static String normalizedString(String string) {
         String message = string.toLowerCase();
+        message = Normalizer.normalize(message, Normalizer.Form.NFD);
         message = ChatColor.stripColor(message);
-        message = message.replaceAll("0", "o");
-        message = message.replaceAll("1", "i");
-        message = message.replaceAll("3", "e");
-        message = message.replaceAll("4", "a");
-        message = message.replaceAll("5", "s");
-        message = message.replaceAll("7", "t");
-        message = message.replaceAll("9", "g");
-        message = message.replaceAll("\\$", "s");
-        message = message.replaceAll("@", "a");
-        message = message.replaceAll("/[^A-Za-z]/g", "");
-        message = message.replaceAll(" ", "");
+        message = diacreticMarks.matcher(message).replaceAll("");
+        message = message.replace('0', 'o');
+        message = message.replace('1', 'i');
+        message = message.replace('3', 'e');
+        message = message.replace('4', 'a');
+        message = message.replace('5', 's');
+        message = message.replace('7', 't');
+        message = message.replace('9', 'g');
+        message = message.replace('$', 's');
+        message = message.replace('@', 'a');
+        message = singleLetterSurroundedBySpacers.matcher(message).replaceAll("$1$2");
         return message;
     }
 
