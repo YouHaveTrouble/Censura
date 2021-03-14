@@ -32,19 +32,25 @@ public class Filter {
         return message;
     }
 
-    public static boolean detectPhrases(String string, String mode) {
+    public static boolean detectPhrases(String string, FilterStrength mode) {
         List<String> exceptions = null;
-        List<String> matches = null;
-        if (mode.equalsIgnoreCase("lite")) {
-            exceptions = Censura.getCachedConfig().getLiteExceptions();
-            matches = Censura.getCachedConfig().getLiteMatches();
-        } else if (mode.equalsIgnoreCase("normal")) {
-            exceptions = Censura.getCachedConfig().getNormalExceptions();
-            matches = Censura.getCachedConfig().getNormalMatches();
-        } else if (mode.equalsIgnoreCase("severe")) {
-            exceptions = Censura.getCachedConfig().getSevereExceptions();
-            matches = Censura.getCachedConfig().getSevereMatches();
+        List<Pattern> matches = null;
+
+        switch (mode) {
+            case SEVERE:
+                exceptions = Censura.getCachedConfig().getSevereExceptions();
+                matches = Censura.getCachedConfig().getSevereMatches();
+                break;
+            case NORMAL:
+                exceptions = Censura.getCachedConfig().getNormalExceptions();
+                matches = Censura.getCachedConfig().getNormalMatches();
+                break;
+            case LITE:
+                exceptions = Censura.getCachedConfig().getLiteExceptions();
+                matches = Censura.getCachedConfig().getLiteMatches();
+                break;
         }
+
         if (matches == null) {
             return false;
         }
@@ -55,13 +61,20 @@ public class Filter {
             }
         } catch (NullPointerException ignored) {}
 
-        for (String match : matches) {
-            Matcher m = Pattern.compile(match).matcher(string);
+        for (Pattern match : matches) {
+            Matcher m = match.matcher(string);
             if (m.find())
                 return true;
         }
 
         return false;
+    }
+
+    public static boolean detect(String message, FilterStrength mode) {
+        return detectPhrases(message, mode) ||
+                detectPhrases(normalizedString(message), mode) ||
+                detectPhrases(noRepeatChars(message), mode) ||
+                detectPhrases(noRepeatChars(normalizedString(message)), mode);
     }
 
     public static boolean filter(String message, Player player) {
@@ -73,63 +86,38 @@ public class Filter {
             return false;
         }
 
-        if (detectPhrases(message, "severe") || detectPhrases(normalizedString(message), "severe")) {
+        if (detect(message, FilterStrength.SEVERE)) {
             doActions(Censura.getCachedConfig().getSeverePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "severe") || detectPhrases(noRepeatChars(normalizedString(message)), "severe")) {
-            doActions(Censura.getCachedConfig().getSeverePunishments(), player);
-            return true;
-        }
-
-        if (detectPhrases(message, "normal") || detectPhrases(normalizedString(message), "normal")) {
+        if (detect(message, FilterStrength.NORMAL)) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "normal") || detectPhrases(noRepeatChars(normalizedString(message)), "normal")) {
-            doActions(Censura.getCachedConfig().getNormalPunishments(), player);
-            return true;
-        }
-
-        if (detectPhrases(message, "lite") || detectPhrases(normalizedString(message), "lite")) {
+        if (detect(message, FilterStrength.LITE)) {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "lite") || detectPhrases(noRepeatChars(normalizedString(message)), "lite")) {
-            doActions(Censura.getCachedConfig().getLitePunishments(), player);
-            return true;
-        }
         return false;
     }
 
     public static boolean filterNoActions(String message) {
 
-        if (detectPhrases(message, "severe") || detectPhrases(normalizedString(message), "severe")) {
+        if (detect(message, FilterStrength.SEVERE)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "severe") || detectPhrases(noRepeatChars(normalizedString(message)), "severe")) {
+        if (detect(message, FilterStrength.NORMAL)) {
             return true;
         }
 
-        if (detectPhrases(message, "normal") || detectPhrases(normalizedString(message), "normal")) {
+        if (detect(message, FilterStrength.LITE)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), "normal") || detectPhrases(noRepeatChars(normalizedString(message)), "normal")) {
-            return true;
-        }
-
-        if (detectPhrases(message, "lite") || detectPhrases(normalizedString(message), "lite")) {
-            return true;
-        }
-
-        if (detectPhrases(noRepeatChars(message), "lite") || detectPhrases(noRepeatChars(normalizedString(message)), "lite")) {
-            return true;
-        }
         return false;
 
     }
@@ -163,4 +151,9 @@ public class Filter {
         }
     }
 
+    public enum FilterStrength {
+        SEVERE,
+        NORMAL,
+        LITE
+    }
 }
