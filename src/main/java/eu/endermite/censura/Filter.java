@@ -65,6 +65,13 @@ public class Filter {
         return false;
     }
 
+    public static boolean detect(String message, FilterStrength mode) {
+        return detectPhrases(message, FilterStrength.SEVERE) ||
+                detectPhrases(normalizedString(message), FilterStrength.SEVERE) ||
+                detectPhrases(noRepeatChars(message), FilterStrength.SEVERE) ||
+                detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.SEVERE);
+    }
+
     public static boolean filter(String message, Player player) {
 
         if (player.isOp() && Censura.getCachedConfig().getOpBypass())
@@ -74,63 +81,38 @@ public class Filter {
             return false;
         }
 
-        if (detectPhrases(message, FilterStrength.SEVERE) || detectPhrases(normalizedString(message), FilterStrength.SEVERE)) {
+        if (detect(message, FilterStrength.SEVERE)) {
             doActions(Censura.getCachedConfig().getSeverePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), FilterStrength.SEVERE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.SEVERE)) {
-            doActions(Censura.getCachedConfig().getSeverePunishments(), player);
-            return true;
-        }
-
-        if (detectPhrases(message, FilterStrength.NORMAL) || detectPhrases(normalizedString(message), FilterStrength.NORMAL)) {
+        if (detect(message, FilterStrength.NORMAL)) {
             doActions(Censura.getCachedConfig().getNormalPunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), FilterStrength.NORMAL) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.NORMAL)) {
-            doActions(Censura.getCachedConfig().getNormalPunishments(), player);
-            return true;
-        }
-
-        if (detectPhrases(message, FilterStrength.LITE) || detectPhrases(normalizedString(message), FilterStrength.LITE)) {
+        if (detect(message, FilterStrength.LITE)) {
             doActions(Censura.getCachedConfig().getLitePunishments(), player);
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), FilterStrength.LITE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.LITE)) {
-            doActions(Censura.getCachedConfig().getLitePunishments(), player);
-            return true;
-        }
         return false;
     }
 
     public static boolean filterNoActions(String message) {
 
-        if (detectPhrases(message, FilterStrength.SEVERE) || detectPhrases(normalizedString(message), FilterStrength.SEVERE)) {
+        if (detect(message, FilterStrength.SEVERE)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), FilterStrength.SEVERE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.SEVERE)) {
+        if (detect(message, FilterStrength.NORMAL)) {
             return true;
         }
 
-        if (detectPhrases(message, FilterStrength.NORMAL) || detectPhrases(normalizedString(message), FilterStrength.NORMAL)) {
+        if (detect(message, FilterStrength.LITE)) {
             return true;
         }
 
-        if (detectPhrases(noRepeatChars(message), FilterStrength.NORMAL) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.NORMAL)) {
-            return true;
-        }
-
-        if (detectPhrases(message, FilterStrength.LITE) || detectPhrases(normalizedString(message), FilterStrength.LITE)) {
-            return true;
-        }
-
-        if (detectPhrases(noRepeatChars(message), FilterStrength.LITE) || detectPhrases(noRepeatChars(normalizedString(message)), FilterStrength.LITE)) {
-            return true;
-        }
         return false;
 
     }
