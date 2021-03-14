@@ -70,6 +70,57 @@ public class Filter {
         return false;
     }
 
+    /**
+     * Checks if a snippet is present in the string.
+     * The snippet must start and end on a word boundary. Besides that the snippet may be interrupted by any non-alphabetic character. A character may also be repeated.
+     *
+     * For the snippet {@code test} the following counts:
+     * "test": true
+     * "aa test aa": true
+     * "aatestaa": false
+     * "aa te st aa" true
+     * "aa t^^e0s--t aa" true
+     * "teeessstttt" true
+     *
+     * @param string string to find snippet in
+     * @param snippet snippet to check for
+     * @return true if the snippet was found
+     */
+    public static boolean find(String string, String snippet) {
+        char[] detectChars = snippet.toCharArray();
+        int state = 0;
+        boolean wasSpacer = true; //start of string counts as spacer
+
+        for (char c : string.toCharArray()) {
+            if (state >= detectChars.length) {
+                if (isSpacer(c)) {
+                    return true; //We've reached the end and reached a spacer
+                }
+            } else if (c == detectChars[state]) {
+                if (state == 0) {
+                    //Can only match the first letter of the snippet after a space
+                    if (wasSpacer) state++;
+                } else {
+                    state++;
+                }
+            }
+            if (state > 0 && c != detectChars[state-1] && !isSpacer(c)) {
+                //This is not a repeated character. We should reset
+                state = 0;
+            }
+
+            wasSpacer = isSpacer(c);
+        }
+
+        if (state >= detectChars.length) return true;
+
+        return false;
+    }
+
+    private static boolean isSpacer(char c) {
+        return !Character.isAlphabetic(c);
+    }
+
     public static boolean detect(String message, FilterStrength mode) {
         return detectPhrases(message, mode) ||
                 detectPhrases(normalizedString(message), mode) ||
