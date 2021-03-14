@@ -7,19 +7,20 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class CachedConfig {
 
     List<String> liteExceptions = new ArrayList<>();
-    List<String> liteMatches = new ArrayList<>();
+    List<Pattern> liteMatches = new ArrayList<>();
     List<String> litePunishments = new ArrayList<>();
 
     List<String> normalExceptions = new ArrayList<>();
-    List<String> normalMatches = new ArrayList<>();
+    List<Pattern> normalMatches = new ArrayList<>();
     List<String> normalPunishments = new ArrayList<>();
 
     List<String> severeExceptions = new ArrayList<>();
-    List<String> severeMatches = new ArrayList<>();
+    List<Pattern> severeMatches = new ArrayList<>();
     List<String> severePunishments = new ArrayList<>();
 
     List<String> commandsToFilter = new ArrayList<>();
@@ -41,7 +42,7 @@ public class CachedConfig {
         ConfigurationSection liteMatch = lite.getConfigurationSection("match");
 
         for (String liteMatchString : liteMatch.getKeys(false)) {
-            liteMatches.add(liteMatchString);
+            liteMatches.add(Pattern.compile(liteMatchString));
             liteExceptions.addAll(liteMatch.getStringList(liteMatchString + ".exceptions"));
         }
 
@@ -57,7 +58,7 @@ public class CachedConfig {
         ConfigurationSection normalMatch = normal.getConfigurationSection("match");
 
         for (String normalMatchString : normalMatch.getKeys(false)) {
-            normalMatches.add(normalMatchString);
+            normalMatches.add(Pattern.compile(normalMatchString));
             normalExceptions.addAll(normalMatch.getStringList(normalMatchString + ".exceptions"));
         }
 
@@ -73,7 +74,7 @@ public class CachedConfig {
         ConfigurationSection severeMatch = severe.getConfigurationSection("match");
 
         for (String severeMatchString : severeMatch.getKeys(false)) {
-            severeMatches.add(severeMatchString);
+            severeMatches.add(Pattern.compile(severeMatchString));
             severeExceptions.addAll(severeMatch.getStringList(severeMatchString + ".exceptions"));
         }
 
@@ -89,7 +90,7 @@ public class CachedConfig {
 
     }
 
-    public List<String> getLiteMatches() {
+    public List<Pattern> getLiteMatches() {
         return liteMatches;
     }
 
@@ -101,7 +102,7 @@ public class CachedConfig {
         return litePunishments;
     }
 
-    public List<String> getNormalMatches() {
+    public List<Pattern> getNormalMatches() {
         return normalMatches;
     }
 
@@ -113,7 +114,7 @@ public class CachedConfig {
         return normalPunishments;
     }
 
-    public List<String> getSevereMatches() {
+    public List<Pattern> getSevereMatches() {
         return severeMatches;
     }
 

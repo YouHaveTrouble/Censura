@@ -29,7 +29,7 @@ public class Filter {
 
     public static boolean detectPhrases(String string, FilterStrength mode) {
         List<String> exceptions = null;
-        List<String> matches = null;
+        List<Pattern> matches = null;
 
         switch (mode) {
             case SEVERE:
@@ -56,8 +56,8 @@ public class Filter {
             }
         } catch (NullPointerException ignored) {}
 
-        for (String match : matches) {
-            Matcher m = Pattern.compile(match).matcher(string);
+        for (Pattern match : matches) {
+            Matcher m = match.matcher(string);
             if (m.find())
                 return true;
         }
