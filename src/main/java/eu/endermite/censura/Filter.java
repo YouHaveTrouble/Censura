@@ -1,5 +1,6 @@
 package eu.endermite.censura;
 
+import eu.endermite.censura.config.CachedConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,24 +33,9 @@ public class Filter {
         return message;
     }
 
-    public static boolean detectPhrases(String string, FilterStrength mode) {
-        List<String> exceptions = null;
-        List<Pattern> matches = null;
-
-        switch (mode) {
-            case SEVERE:
-                exceptions = Censura.getCachedConfig().getSevereExceptions();
-                matches = Censura.getCachedConfig().getSevereMatches();
-                break;
-            case NORMAL:
-                exceptions = Censura.getCachedConfig().getNormalExceptions();
-                matches = Censura.getCachedConfig().getNormalMatches();
-                break;
-            case LITE:
-                exceptions = Censura.getCachedConfig().getLiteExceptions();
-                matches = Censura.getCachedConfig().getLiteMatches();
-                break;
-        }
+    public static boolean detectPhrases(String string, CachedConfig.FilterCategory filter) {
+        List<String> exceptions = filter.getExceptions();
+        List<Pattern> matches = filter.getMatches();
 
         if (matches == null) {
             return false;
@@ -126,11 +112,11 @@ public class Filter {
         return a == b;
     }
 
-    public static boolean detect(String message, FilterStrength mode) {
-        return detectPhrases(message, mode) ||
-                detectPhrases(normalizedString(message), mode) ||
-                detectPhrases(noRepeatChars(message), mode) ||
-                detectPhrases(noRepeatChars(normalizedString(message)), mode);
+    public static boolean detect(String message, CachedConfig.FilterCategory filter) {
+        return detectPhrases(message, filter) ||
+                detectPhrases(normalizedString(message), filter) ||
+                detectPhrases(noRepeatChars(message), filter) ||
+                detectPhrases(noRepeatChars(normalizedString(message)), filter);
     }
 
     public static boolean filter(String message, Player player) {
@@ -142,19 +128,11 @@ public class Filter {
             return false;
         }
 
-        if (detect(message, FilterStrength.SEVERE)) {
-            doActions(Censura.getCachedConfig().getSeverePunishments(), player);
-            return true;
-        }
-
-        if (detect(message, FilterStrength.NORMAL)) {
-            doActions(Censura.getCachedConfig().getNormalPunishments(), player);
-            return true;
-        }
-
-        if (detect(message, FilterStrength.LITE)) {
-            doActions(Censura.getCachedConfig().getLitePunishments(), player);
-            return true;
+        for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
+            if (detect(message, filter)) {
+                doActions(filter.getPunishments(), player);
+                return true;
+            }
         }
 
         return false;
@@ -162,16 +140,10 @@ public class Filter {
 
     public static boolean filterNoActions(String message) {
 
-        if (detect(message, FilterStrength.SEVERE)) {
-            return true;
-        }
-
-        if (detect(message, FilterStrength.NORMAL)) {
-            return true;
-        }
-
-        if (detect(message, FilterStrength.LITE)) {
-            return true;
+        for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
+            if (detect(message, filter)) {
+                return true;
+            }
         }
 
         return false;

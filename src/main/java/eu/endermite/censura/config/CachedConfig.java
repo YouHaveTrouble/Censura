@@ -7,21 +7,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class CachedConfig {
-
-    List<String> liteExceptions = new ArrayList<>();
-    List<Pattern> liteMatches = new ArrayList<>();
-    List<String> litePunishments = new ArrayList<>();
-
-    List<String> normalExceptions = new ArrayList<>();
-    List<Pattern> normalMatches = new ArrayList<>();
-    List<String> normalPunishments = new ArrayList<>();
-
-    List<String> severeExceptions = new ArrayList<>();
-    List<Pattern> severeMatches = new ArrayList<>();
-    List<String> severePunishments = new ArrayList<>();
+    List<FilterCategory> categories = new ArrayList<>();
 
     List<String> commandsToFilter = new ArrayList<>();
 
@@ -29,54 +19,33 @@ public class CachedConfig {
     boolean opBypass, kickOnJoin;
 
     public CachedConfig(FileConfiguration config) {
-
-        ConfigurationSection lite = config.getConfigurationSection("filter.light");
-        if (lite == null) {
+        ConfigurationSection filter = config.getConfigurationSection("filter");
+        if (filter == null) {
             Censura.getPlugin().getLogger().severe("Configuration malformed!");
             Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
 
-        litePunishments = lite.getStringList("action");
+        List<String> filterCategories = new ArrayList<>(filter.getKeys(false));
+        for (int i = filterCategories.size()-1; i >= 0; i--) {
+            ConfigurationSection categorySection = filter.getConfigurationSection(filterCategories.get(i));
 
-        ConfigurationSection liteMatch = lite.getConfigurationSection("match");
+            ArrayList<Pattern> matches = new ArrayList<>();
+            ArrayList<String> exceptions = new ArrayList<>();
 
-        for (String liteMatchString : liteMatch.getKeys(false)) {
-            liteMatches.add(Pattern.compile(liteMatchString));
-            liteExceptions.addAll(liteMatch.getStringList(liteMatchString + ".exceptions"));
+            ConfigurationSection matchSection = categorySection.getConfigurationSection("match");
+            for (String matchString : matchSection.getKeys(false)) {
+                matches.add(Pattern.compile(matchString));
+                exceptions.addAll(matchSection.getStringList(matchString + ".exceptions"));
+            }
+
+            this.categories.add(new FilterCategory(
+                    matches,
+                    exceptions,
+                    categorySection.getStringList("action")
+            ));
         }
 
-        ConfigurationSection normal = config.getConfigurationSection("filter.normal");
-        if (normal == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed!");
-            Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
-            return;
-        }
-
-        normalPunishments = normal.getStringList("action");
-
-        ConfigurationSection normalMatch = normal.getConfigurationSection("match");
-
-        for (String normalMatchString : normalMatch.getKeys(false)) {
-            normalMatches.add(Pattern.compile(normalMatchString));
-            normalExceptions.addAll(normalMatch.getStringList(normalMatchString + ".exceptions"));
-        }
-
-        ConfigurationSection severe = config.getConfigurationSection("filter.severe");
-        if (severe == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed!");
-            Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
-            return;
-        }
-
-        severePunishments = severe.getStringList("action");
-
-        ConfigurationSection severeMatch = severe.getConfigurationSection("match");
-
-        for (String severeMatchString : severeMatch.getKeys(false)) {
-            severeMatches.add(Pattern.compile(severeMatchString));
-            severeExceptions.addAll(severeMatch.getStringList(severeMatchString + ".exceptions"));
-        }
 
         commandsToFilter.addAll(config.getStringList("filtered-commands"));
         opBypass = config.getBoolean("op-bypass", true);
@@ -90,40 +59,8 @@ public class CachedConfig {
 
     }
 
-    public List<Pattern> getLiteMatches() {
-        return liteMatches;
-    }
-
-    public List<String> getLiteExceptions() {
-        return liteExceptions;
-    }
-
-    public List<String> getLitePunishments() {
-        return litePunishments;
-    }
-
-    public List<Pattern> getNormalMatches() {
-        return normalMatches;
-    }
-
-    public List<String> getNormalExceptions() {
-        return normalExceptions;
-    }
-
-    public List<String> getNormalPunishments() {
-        return normalPunishments;
-    }
-
-    public List<Pattern> getSevereMatches() {
-        return severeMatches;
-    }
-
-    public List<String> getSevereExceptions() {
-        return severeExceptions;
-    }
-
-    public List<String> getSeverePunishments() {
-        return severePunishments;
+    public List<FilterCategory> getCategories() {
+        return categories;
     }
 
     public List<String> getCommandsToFilter() {
@@ -154,4 +91,27 @@ public class CachedConfig {
         return kickOnJoin;
     }
 
+    public static class FilterCategory {
+        final List<Pattern> matches;
+        final List<String> exceptions;
+        final List<String> punishments;
+
+        public FilterCategory(List<Pattern> matches, List<String> exceptions, List<String> punishments) {
+            this.matches = matches;
+            this.exceptions = exceptions;
+            this.punishments = punishments;
+        }
+
+        public List<Pattern> getMatches() {
+            return matches;
+        }
+
+        public List<String> getExceptions() {
+            return exceptions;
+        }
+
+        public List<String> getPunishments() {
+            return punishments;
+        }
+    }
 }
