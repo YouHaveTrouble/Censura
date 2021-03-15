@@ -23,6 +23,17 @@ filtered-commands:
   - say
   - me
 
+replacements:
+  '0': o
+  '1': i
+  '3': e
+  '4': a
+  '5': s
+  '7': t
+  '9': g
+  '$': s
+  '@': a
+
 filter:
   # Severe filter. This one is checked FIRST.
   severe:

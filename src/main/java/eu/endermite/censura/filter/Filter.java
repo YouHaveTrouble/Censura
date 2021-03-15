@@ -19,15 +19,7 @@ public class Filter {
         message = Normalizer.normalize(message, Normalizer.Form.NFD);
         message = ChatColor.stripColor(message);
         message = diacreticMarks.matcher(message).replaceAll("");
-        message = message.replace('0', 'o');
-        message = message.replace('1', 'i');
-        message = message.replace('3', 'e');
-        message = message.replace('4', 'a');
-        message = message.replace('5', 's');
-        message = message.replace('7', 't');
-        message = message.replace('9', 'g');
-        message = message.replace('$', 's');
-        message = message.replace('@', 'a');
+        message = Censura.getCachedConfig().getReplacementMap().process(message);
         return message;
     }
 

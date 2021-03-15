@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class CachedConfig {
     List<FilterCategory> categories = new ArrayList<>();
-
+    CharReplacementMap replacementMap;
     List<String> commandsToFilter = new ArrayList<>();
 
     String noPermission, noSuchCommand, configReloaded, kickBadName;
@@ -23,10 +23,18 @@ public class CachedConfig {
     public CachedConfig(FileConfiguration config) {
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed!");
+            Censura.getPlugin().getLogger().severe("Configuration malformed! No filter section found.");
             Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
+
+        ConfigurationSection replacements = config.getConfigurationSection("replacements");
+        if (replacements == null) {
+            Censura.getPlugin().getLogger().severe("Configuration malformed! No replacements section found or it is invalid: "+replacements);
+            Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
+            return;
+        }
+        replacementMap = new CharReplacementMap(replacements.getValues(false));
 
         Set<String> filterCategories = filter.getKeys(false);
         for (String filterCategory : filterCategories) {
@@ -67,7 +75,6 @@ public class CachedConfig {
                 } else {
                     Censura.getPlugin().getLogger().warning(matchObject+" in "+filterCategory+" is not a string nor a map. Instead it's a: "+matchObject.getClass().getSimpleName());
                 }
-
             }
 
             this.categories.add(new FilterCategory(
@@ -86,11 +93,14 @@ public class CachedConfig {
         noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
         configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
         kickBadName = messages.getString("kick-bad-name", "Censura\n&cYour name contains bad words!");
-
     }
 
     public List<FilterCategory> getCategories() {
         return categories;
+    }
+
+    public CharReplacementMap getReplacementMap() {
+        return replacementMap;
     }
 
     public List<String> getCommandsToFilter() {
