@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 public class Filter {
     private static final Pattern diacreticMarks = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-    private static final Pattern singleLetterSurroundedBySpacers = Pattern.compile("^(\\w)\\W+(?=\\w\\w)|\\W+(\\w)((\\W+(?=\\w\\w))|(?!\\w))");
 
     public static String preprocessString(String string) {
         String message = string.toLowerCase();
@@ -29,7 +28,6 @@ public class Filter {
         message = message.replace('9', 'g');
         message = message.replace('$', 's');
         message = message.replace('@', 'a');
-        //message = singleLetterSurroundedBySpacers.matcher(message).replaceAll("$1$2");
         return message;
     }
 
@@ -39,7 +37,7 @@ public class Filter {
         List<MatchType> matches = filter.getMatches();
 
         for (MatchType match : matches) {
-            if (match.match(string)) {
+            if (match.match(string, new FilterCache())) {
                 return true;
             }
         }
@@ -73,20 +71,6 @@ public class Filter {
         }
 
         return false;
-    }
-
-    private static String noRepeatChars(String string) {
-        char[] chars;
-        chars = string.toCharArray();
-        StringBuilder result = new StringBuilder();
-        char lastChar = ' ';
-        for (char c : chars) {
-            if (lastChar == c)
-                continue;
-            lastChar = c;
-            result.append(c);
-        }
-        return result.toString();
     }
 
     public static void doActions(List<String> actions, Player player) {

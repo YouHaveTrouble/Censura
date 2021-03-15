@@ -18,7 +18,7 @@ public class FullwordMatch implements MatchType {
 // "teeessstttt" true
 
 	@Override
-	public boolean match(String message) {
+	public boolean match(String message, FilterCache cache) {
 		int state = 0;
 		boolean wasSpacer = true; //start of string counts as spacer
 

@@ -10,7 +10,7 @@ public class RegexMatch implements MatchType {
 	}
 
 	@Override
-	public boolean match(String message) {
+	public boolean match(String message, FilterCache cache) {
 		return pattern.matcher(message).matches();
 	}
 }

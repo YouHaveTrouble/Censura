@@ -1,10 +1,9 @@
 package eu.endermite.censura.filter;
 
 import javax.annotation.Nullable;
-import java.text.ParseException;
 
 public interface MatchType {
-	boolean match(String message);
+	boolean match(String message, FilterCache cache);
 
 	static @Nullable MatchType fromString(@Nullable String type, String input) {
 		if (type == null) return new FullwordMatch(input);
