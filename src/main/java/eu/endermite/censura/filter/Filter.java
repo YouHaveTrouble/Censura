@@ -1,5 +1,6 @@
-package eu.endermite.censura;
+package eu.endermite.censura.filter;
 
+import eu.endermite.censura.Censura;
 import eu.endermite.censura.config.CachedConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -8,14 +9,13 @@ import org.bukkit.entity.Player;
 
 import java.text.Normalizer;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Filter {
     private static final Pattern diacreticMarks = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
     private static final Pattern singleLetterSurroundedBySpacers = Pattern.compile("^(\\w)\\W+(?=\\w\\w)|\\W+(\\w)((\\W+(?=\\w\\w))|(?!\\w))");
 
-    public static String normalizedString(String string) {
+    public static String preprocessString(String string) {
         String message = string.toLowerCase();
         message = Normalizer.normalize(message, Normalizer.Form.NFD);
         message = ChatColor.stripColor(message);
@@ -29,98 +29,24 @@ public class Filter {
         message = message.replace('9', 'g');
         message = message.replace('$', 's');
         message = message.replace('@', 'a');
-        message = singleLetterSurroundedBySpacers.matcher(message).replaceAll("$1$2");
+        //message = singleLetterSurroundedBySpacers.matcher(message).replaceAll("$1$2");
         return message;
     }
 
-    public static boolean detectPhrases(String string, CachedConfig.FilterCategory filter) {
-        List<String> exceptions = filter.getExceptions();
-        List<Pattern> matches = filter.getMatches();
+    public static boolean detect(String string, CachedConfig.FilterCategory filter) {
+        string = preprocessString(string);
 
-        if (matches == null) {
-            return false;
-        }
+        List<MatchType> matches = filter.getMatches();
 
-        try {
-            for (String exception : exceptions) {
-                string = string.replaceAll(exception, "*");
-            }
-        } catch (NullPointerException ignored) {}
-
-        for (Pattern match : matches) {
-            Matcher m = match.matcher(string);
-            if (m.find())
+        for (MatchType match : matches) {
+            if (match.match(string)) {
                 return true;
+            }
         }
 
         return false;
     }
-
-    /**
-     * Checks if a snippet is present in the string.
-     * The snippet must start and end on a word boundary. Besides that the snippet may be interrupted by any non-alphabetic character. A character may also be repeated.
-     *
-     * For the snippet {@code test} the following counts:
-     * "test": true
-     * "aa test aa": true
-     * "aatestaa": false
-     * "aa te st aa" true
-     * "aa t^^e0s--t aa" true
-     * "teeessstttt" true
-     *
-     * @param string string to find snippet in
-     * @param snippet snippet to check for
-     * @return true if the snippet was found
-     */
-    public static boolean find(String string, String snippet) {
-        char[] detectChars = snippet.toCharArray();
-        int state = 0;
-        boolean wasSpacer = true; //start of string counts as spacer
-
-        for (char c : string.toCharArray()) {
-            if (state >= detectChars.length) {
-                if (isSpacer(c)) {
-                    return true; //We've reached the end and reached a spacer
-                }
-            } else if (match(c, detectChars[state])) {
-                if (state == 0) {
-                    //Can only match the first letter of the snippet after a space
-                    if (wasSpacer) state++;
-                } else {
-                    state++;
-                }
-            }
-            if (state > 0 && !match(c,detectChars[state-1]) && !isSpacer(c)) {
-                //This is not a repeated character. We should reset
-                state = 0;
-            }
-
-            wasSpacer = isSpacer(c);
-        }
-
-        if (state >= detectChars.length) return true;
-
-        return false;
-    }
-
-    private static boolean isSpacer(char c) {
-        return !Character.isAlphabetic(c);
-    }
-
-    private static boolean match(char a, char b) {
-        if (b == '*') return true;
-        return a == b;
-    }
-
-    public static boolean detect(String message, CachedConfig.FilterCategory filter) {
-        return detectPhrases(message, filter) ||
-                detectPhrases(normalizedString(message), filter) ||
-                detectPhrases(noRepeatChars(message), filter) ||
-                detectPhrases(noRepeatChars(normalizedString(message)), filter);
-    }
-
     public static boolean filter(String message, Player player) {
-
         if (player.isOp() && Censura.getCachedConfig().getOpBypass())
             return false;
 
@@ -147,7 +73,6 @@ public class Filter {
         }
 
         return false;
-
     }
 
     private static String noRepeatChars(String string) {
@@ -177,11 +102,5 @@ public class Filter {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
             }
         }
-    }
-
-    public enum FilterStrength {
-        SEVERE,
-        NORMAL,
-        LITE
     }
 }

@@ -29,41 +29,24 @@ filter:
     action:
       - "command: ban %player% Censura - Using offensive words."
     match:
-      nigg:
-        exceptions:
-          - snigg
-          - niggard
-      niga:
-        exceptions:
-          - nigahiga
-          - nigard
-          - snig
-      niba:
-        exceptions:
-          - annibal
-          - miniba
-      nibb:
-        exceptions:
-          - nibbl
-          - snibbi
+      - nigg: "contain"
+      - niga
+      - niba
+      - nibb
   # Normal filter. This one is checked AFTER severe.
   normal:
     action:
       - "command: kick %player% Censura - Stop using curse words!"
     match:
-      fuck:
-        exceptions: []
-      faggot:
-        exceptions: []
+      - fuck: "contain"
+      - faggot
   # Light filter. This one is checked LAST
   light:
     action:
       - "message: Censura - Stop using bad words, %player%!"
     match:
-      sex:
-        exceptions: []
-      porn:
-        exceptions: []
+      - sex
+      - porn: "contain"
 
 
 # Messages used by the plugin

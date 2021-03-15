@@ -1,12 +1,14 @@
 package eu.endermite.censura.config;
 
 import eu.endermite.censura.Censura;
+import eu.endermite.censura.filter.MatchType;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -30,18 +32,46 @@ public class CachedConfig {
         for (String filterCategory : filterCategories) {
             ConfigurationSection categorySection = filter.getConfigurationSection(filterCategory);
 
-            ArrayList<Pattern> matches = new ArrayList<>();
-            ArrayList<String> exceptions = new ArrayList<>();
+            ArrayList<MatchType> matches = new ArrayList<>();
 
-            ConfigurationSection matchSection = categorySection.getConfigurationSection("match");
-            for (String matchString : matchSection.getKeys(false)) {
-                matches.add(Pattern.compile(matchString));
-                exceptions.addAll(matchSection.getStringList(matchString + ".exceptions"));
+            List<?> matchList = categorySection.getList("match");
+            if (matchList == null) {
+                Censura.getPlugin().getLogger().severe("Configuration malformed!");
+                Censura.getPlugin().getLogger().severe(filterCategory+" doesn't contain a match section.");
+                return;
+            }
+
+            // This is a list of either strings or maps
+            for (Object matchObject : matchList) {
+                if (matchObject == null) continue;
+                if (matchObject instanceof Integer) matchObject = matchObject.toString();
+                if (matchObject instanceof String) {
+                    matches.add(MatchType.fromString(null, (String)matchObject));
+                } else if (matchObject instanceof Map) {
+                    Map<?,?> map = (Map<?,?>)matchObject;
+                    if (map.size() != 1) {
+                        Censura.getPlugin().getLogger().warning("Expected only one object in map. This usually means you forgot to add a '-' in front of a match.");
+                    }
+                    Map.Entry<?,?> entry = map.entrySet().stream().findFirst().orElseThrow(IllegalStateException::new);
+
+                    if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
+                        MatchType match = MatchType.fromString((String)entry.getValue(), (String)entry.getKey());
+                        if (match == null) {
+                            Censura.getPlugin().getLogger().warning(entry.getValue()+" is not a valid type! Skipping...");
+                        } else {
+                            matches.add(match);
+                        }
+                    } else {
+                        Censura.getPlugin().getLogger().warning(matchObject+" in "+filterCategory+" does not contain strings.");
+                    }
+                } else {
+                    Censura.getPlugin().getLogger().warning(matchObject+" in "+filterCategory+" is not a string nor a map. Instead it's a: "+matchObject.getClass().getSimpleName());
+                }
+
             }
 
             this.categories.add(new FilterCategory(
                     matches,
-                    exceptions,
                     categorySection.getStringList("action")
             ));
         }
@@ -92,22 +122,16 @@ public class CachedConfig {
     }
 
     public static class FilterCategory {
-        final List<Pattern> matches;
-        final List<String> exceptions;
+        final List<MatchType> matches;
         final List<String> punishments;
 
-        public FilterCategory(List<Pattern> matches, List<String> exceptions, List<String> punishments) {
+        public FilterCategory(List<MatchType> matches, List<String> punishments) {
             this.matches = matches;
-            this.exceptions = exceptions;
             this.punishments = punishments;
         }
 
-        public List<Pattern> getMatches() {
+        public List<MatchType> getMatches() {
             return matches;
-        }
-
-        public List<String> getExceptions() {
-            return exceptions;
         }
 
         public List<String> getPunishments() {

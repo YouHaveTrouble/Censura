@@ -1,6 +1,6 @@
 package eu.endermite.censura.listener;
 
-import eu.endermite.censura.Filter;
+import eu.endermite.censura.filter.Filter;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
