@@ -24,26 +24,6 @@ filtered-commands:
   - me
 
 filter:
-  # Light filter. This one is checked LAST
-  light:
-    action:
-      - "message: Censura - Stop using bad words, %player%!"
-    match:
-      sex:
-        exceptions: []
-      porn:
-        exceptions: []
-
-  # Normal filter. This one is checked AFTER severe.
-  normal:
-    action:
-      - "command: kick %player% Censura - Stop using curse words!"
-    match:
-      fuck:
-        exceptions: []
-      faggot:
-        exceptions: []
-
   # Severe filter. This one is checked FIRST.
   severe:
     action:
@@ -66,6 +46,25 @@ filter:
         exceptions:
           - nibbl
           - snibbi
+  # Normal filter. This one is checked AFTER severe.
+  normal:
+    action:
+      - "command: kick %player% Censura - Stop using curse words!"
+    match:
+      fuck:
+        exceptions: []
+      faggot:
+        exceptions: []
+  # Light filter. This one is checked LAST
+  light:
+    action:
+      - "message: Censura - Stop using bad words, %player%!"
+    match:
+      sex:
+        exceptions: []
+      porn:
+        exceptions: []
+
 
 # Messages used by the plugin
 messages:

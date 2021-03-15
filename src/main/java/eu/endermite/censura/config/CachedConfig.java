@@ -26,9 +26,9 @@ public class CachedConfig {
             return;
         }
 
-        List<String> filterCategories = new ArrayList<>(filter.getKeys(false));
-        for (int i = filterCategories.size()-1; i >= 0; i--) {
-            ConfigurationSection categorySection = filter.getConfigurationSection(filterCategories.get(i));
+        Set<String> filterCategories = filter.getKeys(false);
+        for (String filterCategory : filterCategories) {
+            ConfigurationSection categorySection = filter.getConfigurationSection(filterCategory);
 
             ArrayList<Pattern> matches = new ArrayList<>();
             ArrayList<String> exceptions = new ArrayList<>();
