@@ -28,8 +28,9 @@ public class Filter {
 
         List<MatchType> matches = filter.getMatches();
 
+        FilterCache cache = new FilterCache();
         for (MatchType match : matches) {
-            if (match.match(string, new FilterCache())) {
+            if (match.match(string, cache)) {
                 return true;
             }
         }
