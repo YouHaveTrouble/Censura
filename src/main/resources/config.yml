@@ -4,6 +4,9 @@ op-bypass: true
 # Should players be denied to join if their name contains bad words?
 kick-on-bad-name: true
 
+# Should detections that contain filtered words be logged in console
+log-detections: true
+
 # Commands of which arguments should be checked.
 # It's recommended to list all private message commands and their aliases
 # and every command that allows changing item name and etc.

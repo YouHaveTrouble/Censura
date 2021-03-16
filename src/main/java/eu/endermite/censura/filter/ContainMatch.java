@@ -1,5 +1,6 @@
 package eu.endermite.censura.filter;
 
+import eu.endermite.censura.Censura;
 import java.util.regex.Pattern;
 
 public class ContainMatch implements MatchType {
@@ -19,8 +20,13 @@ public class ContainMatch implements MatchType {
             cache.spammySpacesRemovedNoRepeat = noRepeatChars(cache.spammySpacesRemoved);
         }
 
-        return cache.spammySpacesRemovedNoRepeat.contains(snippet) ||
-                cache.spammySpacesRemoved.contains(snippet);
+        if (cache.spammySpacesRemovedNoRepeat.contains(snippet) ||
+                cache.spammySpacesRemoved.contains(snippet)) {
+            if (Censura.getCachedConfig().isLogDetections())
+                Censura.getPlugin().getLogger().info("Detected \""+snippet+"\" in phrase \""+message+"\" (Contain match)");
+            return true;
+        }
+        return false;
     }
 
     private static String noRepeatChars(String string) {

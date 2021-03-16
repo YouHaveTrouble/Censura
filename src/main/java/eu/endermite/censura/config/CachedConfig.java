@@ -17,7 +17,7 @@ public class CachedConfig {
     List<String> commandsToFilter = new ArrayList<>();
 
     String noPermission, noSuchCommand, configReloaded, kickBadName;
-    boolean opBypass, kickOnJoin;
+    boolean opBypass, kickOnJoin, logDetections;
 
     public CachedConfig(FileConfiguration config) {
         ConfigurationSection filter = config.getConfigurationSection("filter");
@@ -86,6 +86,7 @@ public class CachedConfig {
         commandsToFilter.addAll(config.getStringList("filtered-commands"));
         opBypass = config.getBoolean("op-bypass", true);
         kickOnJoin = config.getBoolean("kick-on-bad-name", true);
+        logDetections = config.getBoolean("log-detections", true);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
         noPermission = messages.getString("no-permission", "Censura - &cYou don't have permission to do this.");
@@ -128,6 +129,10 @@ public class CachedConfig {
 
     public boolean getKickOnJoin() {
         return kickOnJoin;
+    }
+
+    public boolean isLogDetections() {
+        return logDetections;
     }
 
     public static class FilterCategory {
