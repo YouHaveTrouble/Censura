@@ -51,22 +51,32 @@ filter:
     action:
       - "command: ban %player% Censura - Using offensive words."
     match:
-      - nigg: "contain"
+      - nigger
+      - nibber
       - niga
       - niba
-      - nibb
+      - hitler did nothing wrong
+      - heil hitler
   normal:
     action:
       - "command: kick %player% Censura - Stop using curse words!"
     match:
       - fuck: "contain"
+      - bitch
       - faggot
+      - tranny
+      - trannie
+      - gay is a sin
+      - gay is sin
   light:
     action:
       - "message: Censura - Stop using bad words, %player%!"
     match:
       - sex
       - porn: "contain"
+      - shit: "contain"
+      - fag: "contain"
+      - nigg: "contain"
 
 # Messages used by the plugin
 messages:
