@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class CachedConfig {
     List<FilterCategory> categories = new ArrayList<>();
@@ -30,7 +29,7 @@ public class CachedConfig {
 
         ConfigurationSection replacements = config.getConfigurationSection("replacements");
         if (replacements == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed! No replacements section found or it is invalid: "+replacements);
+            Censura.getPlugin().getLogger().severe("Configuration malformed! No replacements section found or it is invalid: " + replacements);
             Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
@@ -45,7 +44,7 @@ public class CachedConfig {
             List<?> matchList = categorySection.getList("match");
             if (matchList == null) {
                 Censura.getPlugin().getLogger().severe("Configuration malformed!");
-                Censura.getPlugin().getLogger().severe(filterCategory+" doesn't contain a match section.");
+                Censura.getPlugin().getLogger().severe(filterCategory + " doesn't contain a match section.");
                 return;
             }
 
@@ -65,15 +64,15 @@ public class CachedConfig {
                     if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
                         MatchType match = MatchType.fromString((String)entry.getValue(), (String)entry.getKey());
                         if (match == null) {
-                            Censura.getPlugin().getLogger().warning(entry.getValue()+" is not a valid type! Skipping...");
+                            Censura.getPlugin().getLogger().warning(entry.getValue() + " is not a valid type! Skipping...");
                         } else {
                             matches.add(match);
                         }
                     } else {
-                        Censura.getPlugin().getLogger().warning(matchObject+" in "+filterCategory+" does not contain strings.");
+                        Censura.getPlugin().getLogger().warning(matchObject + " in " + filterCategory + " does not contain strings.");
                     }
                 } else {
-                    Censura.getPlugin().getLogger().warning(matchObject+" in "+filterCategory+" is not a string nor a map. Instead it's a: "+matchObject.getClass().getSimpleName());
+                    Censura.getPlugin().getLogger().warning(matchObject + " in " + filterCategory + " is not a string nor a map. Instead it's a: " + matchObject.getClass().getSimpleName());
                 }
             }
 

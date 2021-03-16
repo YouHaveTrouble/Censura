@@ -36,6 +36,7 @@ public class Filter {
 
         return false;
     }
+
     public static boolean filter(String message, Player player) {
         if (player.isOp() && Censura.getCachedConfig().getOpBypass())
             return false;

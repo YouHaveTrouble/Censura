@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.PluginDescriptionFile;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +34,13 @@ public class CensuraCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        HashMap<String, String> allSubCommands = new HashMap<>();
+        HashMap<String,String> allSubCommands = new HashMap<>();
         List<String> result = new ArrayList<>();
 
         allSubCommands.put("reload", "censura.reload");
 
         if (args.length == 1) {
-            for (Map.Entry<String, String> sub : allSubCommands.entrySet()) {
+            for (Map.Entry<String,String> sub : allSubCommands.entrySet()) {
                 if (sub.getKey().startsWith(args[0].toLowerCase()) && sender.hasPermission(sub.getValue()))
                     result.add(sub.getKey());
             }
