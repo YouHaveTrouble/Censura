@@ -1,18 +1,11 @@
-# Exceptions are filtered >>before<< the match filters to make sure there are no false positives.
-
-# Each "action" list is unlimited and can have as many actions as you want
-# Possible "action" types:
-# "message: <message>" - sends a message to player who triggered the filter
-# "command: <command>" - executes command as console.
-
-# Placeholder available for all actions:
-# %player% - name of the player who triggered the filter
-
 # Should server operators bypass the filters?
 op-bypass: true
 
 # Should players be denied to join if their name contains bad words?
 kick-on-bad-name: true
+
+# Should detections that contain filtered words be logged in console
+log-detections: true
 
 # Commands of which arguments should be checked.
 # It's recommended to list all private message commands and their aliases
@@ -23,49 +16,70 @@ filtered-commands:
   - say
   - me
 
+# These characters are replaced by the character on the right before processing.
+replacements:
+  '0': o
+  '1': i
+  '3': e
+  '4': a
+  '5': s
+  '7': t
+  '9': g
+  '$': s
+  '@': a
+
+##### FILTERS
+# Filters are processed in order from top to bottom
+# You can have an unlimited number of filters.
+###############################################################
+# Each filter has a list of "matches". These are words that are checked for the filter.
+# Types of matches:
+#   - "fullword" Checks if the sentence contains this word. It must be surrounded by spaces.
+#                Besides that, the filter is smart and will ignore any characters in between the word.
+#                You can use the * character to bypass the limitation of needing a space: "test*" will match on "testsomething"
+#   - "contain"  Checks if the sentence contains the string, the string may be part of another word.
+#                Will ignore spaces inside the word unless they're used in an obviously spammy way.
+#   - "regex"    Match a simple regex on the string. No smartness involved.
+# By default the "fullword" match type is used.
+
+###############################################################
+# Each filter can have an unlimited number of "actions". Possible "action" types:
+#   - "message: <message>" - sends a message to player who triggered the filter
+#   - "command: <command>" - executes command as console.
+# Placeholders available for all actions:
+# %player% - name of the player who triggered the filter
+
 filter:
-  # Light filter. This one is checked LAST
-  light:
-    action:
-      - "message: Censura - Stop using bad words, %player%!"
-    match:
-      sex:
-        exceptions: []
-      porn:
-        exceptions: []
-
-  # Normal filter. This one is checked AFTER severe.
-  normal:
-    action:
-      - "command: kick %player% Censura - Stop using curse words!"
-    match:
-      fuck:
-        exceptions: []
-      faggot:
-        exceptions: []
-
-  # Severe filter. This one is checked FIRST.
   severe:
     action:
       - "command: ban %player% Censura - Using offensive words."
     match:
-      nigg:
-        exceptions:
-          - snigg
-          - niggard
-      niga:
-        exceptions:
-          - nigahiga
-          - nigard
-          - snig
-      niba:
-        exceptions:
-          - annibal
-          - miniba
-      nibb:
-        exceptions:
-          - nibbl
-          - snibbi
+      - nigger
+      - nibber
+      - niga
+      - niba
+      - hitler did nothing wrong
+      - heil hitler
+  normal:
+    action:
+      - "command: kick %player% Censura - Stop using curse words!"
+    match:
+      - fuck: "contain"
+      - bitch
+      - faggot
+      - tranny
+      - trannie
+      - gay is a sin
+      - gay is sin
+  light:
+    action:
+      - "message: Censura - Stop using bad words, %player%!"
+    match:
+      - sex
+      - porn: "contain"
+      - shit: "contain"
+      - fag: "contain"
+      - nigg: "contain"
 
 # Messages used by the plugin
 messages:

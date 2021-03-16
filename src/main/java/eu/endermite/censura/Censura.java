@@ -54,6 +54,7 @@ public final class Censura extends JavaPlugin {
     public static Censura getPlugin() {
         return plugin;
     }
+
     public static CachedConfig getCachedConfig() {
         return cachedConfig;
     }

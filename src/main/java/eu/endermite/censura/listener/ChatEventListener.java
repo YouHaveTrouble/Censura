@@ -1,6 +1,6 @@
 package eu.endermite.censura.listener;
 
-import eu.endermite.censura.Filter;
+import eu.endermite.censura.filter.Filter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -10,9 +10,8 @@ public class ChatEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChatEvent(AsyncPlayerChatEvent event) {
-        if (Filter.filter(event.getMessage(), event.getPlayer())) {
+        if (Filter.filter(event.getMessage(), event.getPlayer()))
             event.setCancelled(true);
-        }
     }
 
 }

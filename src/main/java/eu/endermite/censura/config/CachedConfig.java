@@ -1,128 +1,106 @@
 package eu.endermite.censura.config;
 
 import eu.endermite.censura.Censura;
+import eu.endermite.censura.filter.MatchType;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CachedConfig {
-
-    List<String> liteExceptions = new ArrayList<>();
-    List<String> liteMatches = new ArrayList<>();
-    List<String> litePunishments = new ArrayList<>();
-
-    List<String> normalExceptions = new ArrayList<>();
-    List<String> normalMatches = new ArrayList<>();
-    List<String> normalPunishments = new ArrayList<>();
-
-    List<String> severeExceptions = new ArrayList<>();
-    List<String> severeMatches = new ArrayList<>();
-    List<String> severePunishments = new ArrayList<>();
-
+    List<FilterCategory> categories = new ArrayList<>();
+    CharReplacementMap replacementMap;
     List<String> commandsToFilter = new ArrayList<>();
 
     String noPermission, noSuchCommand, configReloaded, kickBadName;
-    boolean opBypass, kickOnJoin;
+    boolean opBypass, kickOnJoin, logDetections;
 
     public CachedConfig(FileConfiguration config) {
-
-        ConfigurationSection lite = config.getConfigurationSection("filter.light");
-        if (lite == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed!");
+        ConfigurationSection filter = config.getConfigurationSection("filter");
+        if (filter == null) {
+            Censura.getPlugin().getLogger().severe("Configuration malformed! No filter section found.");
             Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
 
-        litePunishments = lite.getStringList("action");
-
-        ConfigurationSection liteMatch = lite.getConfigurationSection("match");
-
-        for (String liteMatchString : liteMatch.getKeys(false)) {
-            liteMatches.add(liteMatchString);
-            liteExceptions.addAll(liteMatch.getStringList(liteMatchString + ".exceptions"));
-        }
-
-        ConfigurationSection normal = config.getConfigurationSection("filter.normal");
-        if (normal == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed!");
+        ConfigurationSection replacements = config.getConfigurationSection("replacements");
+        if (replacements == null) {
+            Censura.getPlugin().getLogger().severe("Configuration malformed! No replacements section found or it is invalid: " + replacements);
             Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
+        replacementMap = new CharReplacementMap(replacements.getValues(false));
 
-        normalPunishments = normal.getStringList("action");
+        Set<String> filterCategories = filter.getKeys(false);
+        for (String filterCategory : filterCategories) {
+            ConfigurationSection categorySection = filter.getConfigurationSection(filterCategory);
 
-        ConfigurationSection normalMatch = normal.getConfigurationSection("match");
+            ArrayList<MatchType> matches = new ArrayList<>();
 
-        for (String normalMatchString : normalMatch.getKeys(false)) {
-            normalMatches.add(normalMatchString);
-            normalExceptions.addAll(normalMatch.getStringList(normalMatchString + ".exceptions"));
+            List<?> matchList = categorySection.getList("match");
+            if (matchList == null) {
+                Censura.getPlugin().getLogger().severe("Configuration malformed!");
+                Censura.getPlugin().getLogger().severe(filterCategory + " doesn't contain a match section.");
+                return;
+            }
+
+            // This is a list of either strings or maps
+            for (Object matchObject : matchList) {
+                if (matchObject == null) continue;
+                if (matchObject instanceof Integer) matchObject = matchObject.toString();
+                if (matchObject instanceof String) {
+                    matches.add(MatchType.fromString(null, (String)matchObject));
+                } else if (matchObject instanceof Map) {
+                    Map<?,?> map = (Map<?,?>)matchObject;
+                    if (map.size() != 1) {
+                        Censura.getPlugin().getLogger().warning("Expected only one object in map. This usually means you forgot to add a '-' in front of a match.");
+                    }
+                    Map.Entry<?,?> entry = map.entrySet().stream().findFirst().orElseThrow(IllegalStateException::new);
+
+                    if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
+                        MatchType match = MatchType.fromString((String)entry.getValue(), (String)entry.getKey());
+                        if (match == null) {
+                            Censura.getPlugin().getLogger().warning(entry.getValue() + " is not a valid type! Skipping...");
+                        } else {
+                            matches.add(match);
+                        }
+                    } else {
+                        Censura.getPlugin().getLogger().warning(matchObject + " in " + filterCategory + " does not contain strings.");
+                    }
+                } else {
+                    Censura.getPlugin().getLogger().warning(matchObject + " in " + filterCategory + " is not a string nor a map. Instead it's a: " + matchObject.getClass().getSimpleName());
+                }
+            }
+
+            this.categories.add(new FilterCategory(
+                    matches,
+                    categorySection.getStringList("action")
+            ));
         }
 
-        ConfigurationSection severe = config.getConfigurationSection("filter.severe");
-        if (severe == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed!");
-            Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
-            return;
-        }
-
-        severePunishments = severe.getStringList("action");
-
-        ConfigurationSection severeMatch = severe.getConfigurationSection("match");
-
-        for (String severeMatchString : severeMatch.getKeys(false)) {
-            severeMatches.add(severeMatchString);
-            severeExceptions.addAll(severeMatch.getStringList(severeMatchString + ".exceptions"));
-        }
 
         commandsToFilter.addAll(config.getStringList("filtered-commands"));
         opBypass = config.getBoolean("op-bypass", true);
         kickOnJoin = config.getBoolean("kick-on-bad-name", true);
+        logDetections = config.getBoolean("log-detections", true);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
         noPermission = messages.getString("no-permission", "Censura - &cYou don't have permission to do this.");
         noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
         configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
         kickBadName = messages.getString("kick-bad-name", "Censura\n&cYour name contains bad words!");
-
     }
 
-    public List<String> getLiteMatches() {
-        return liteMatches;
+    public List<FilterCategory> getCategories() {
+        return categories;
     }
 
-    public List<String> getLiteExceptions() {
-        return liteExceptions;
-    }
-
-    public List<String> getLitePunishments() {
-        return litePunishments;
-    }
-
-    public List<String> getNormalMatches() {
-        return normalMatches;
-    }
-
-    public List<String> getNormalExceptions() {
-        return normalExceptions;
-    }
-
-    public List<String> getNormalPunishments() {
-        return normalPunishments;
-    }
-
-    public List<String> getSevereMatches() {
-        return severeMatches;
-    }
-
-    public List<String> getSevereExceptions() {
-        return severeExceptions;
-    }
-
-    public List<String> getSeverePunishments() {
-        return severePunishments;
+    public CharReplacementMap getReplacementMap() {
+        return replacementMap;
     }
 
     public List<String> getCommandsToFilter() {
@@ -153,4 +131,25 @@ public class CachedConfig {
         return kickOnJoin;
     }
 
+    public boolean isLogDetections() {
+        return logDetections;
+    }
+
+    public static class FilterCategory {
+        final List<MatchType> matches;
+        final List<String> punishments;
+
+        public FilterCategory(List<MatchType> matches, List<String> punishments) {
+            this.matches = matches;
+            this.punishments = punishments;
+        }
+
+        public List<MatchType> getMatches() {
+            return matches;
+        }
+
+        public List<String> getPunishments() {
+            return punishments;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 package eu.endermite.censura.listener;
 
-import eu.endermite.censura.Filter;
+import eu.endermite.censura.filter.Filter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,11 +12,9 @@ public class SignChangeListener implements Listener {
     public void onSignChangeEvent(org.bukkit.event.block.SignChangeEvent event) {
         Player player = event.getPlayer();
 
-        StringBuilder signContent = new StringBuilder();
-        for (String line : event.getLines())
-            signContent.append(line).append(" ");
+        String content = String.join(" ", event.getLines());
 
-        if (Filter.filter(signContent.toString(), player))
+        if (Filter.filter(content, player))
             event.setCancelled(true);
 
     }

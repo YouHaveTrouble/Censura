@@ -1,6 +1,6 @@
 package eu.endermite.censura.listener;
 
-import eu.endermite.censura.Filter;
+import eu.endermite.censura.filter.Filter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,23 +17,21 @@ public class ItemRenameListener implements Listener {
 
         Inventory inv = event.getClickedInventory();
 
-        if (inv == null) {
+        if (inv == null)
             return;
-        }
 
-        if (!inv.getType().equals(InventoryType.ANVIL)) {
+        if (!inv.getType().equals(InventoryType.ANVIL))
             return;
-        }
 
-        if (event.getSlot() != 2) {
+        if (event.getSlot() != 2)
             return;
-        }
 
-        AnvilInventory anvil = (AnvilInventory) inv;
-        Player player = (Player) event.getWhoClicked();
-        if (Filter.filter(anvil.getRenameText(), player)) {
+        AnvilInventory anvil = (AnvilInventory)inv;
+        Player player = (Player)event.getWhoClicked();
+
+        if (Filter.filter(anvil.getRenameText(), player))
             event.setCancelled(true);
-        }
+
 
     }
 

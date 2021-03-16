@@ -1,6 +1,6 @@
 package eu.endermite.censura.listener;
 
-import eu.endermite.censura.Filter;
+import eu.endermite.censura.filter.Filter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,6 +17,7 @@ public class BookEditListener implements Listener {
             for (String page : bookMeta.getPages()) {
                 if (Filter.filter(page, event.getPlayer())) {
                     event.setCancelled(true);
+                    return;
                 }
             }
         } catch (NullPointerException ignored) {}
