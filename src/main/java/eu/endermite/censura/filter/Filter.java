@@ -23,14 +23,16 @@ public class Filter {
         return message;
     }
 
-    public static boolean detect(String string, CachedConfig.FilterCategory filter) {
-        string = preprocessString(string);
+    public static boolean detect(String message, CachedConfig.FilterCategory filter) {
+        message = preprocessString(message);
 
         List<MatchType> matches = filter.getMatches();
 
         FilterCache cache = new FilterCache();
         for (MatchType match : matches) {
-            if (match.match(string, cache)) {
+            if (match.match(message, cache)) {
+                if (Censura.getCachedConfig().isLogDetections())
+                    Censura.getPlugin().getLogger().info(String.format("Detected \"%s\" in phrase \"%s\" (type: %s)", match.getSnippet(), message, match.getType()));
                 return true;
             }
         }

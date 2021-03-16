@@ -48,4 +48,14 @@ public class FullwordMatch implements MatchType {
         if (b == ' ') return isSpacer(a);
         return a == b;
     }
+
+    @Override
+    public String getSnippet() {
+        return new String(snippetChars);
+    }
+
+    @Override
+    public String getType() {
+        return "regex";
+    }
 }

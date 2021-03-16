@@ -20,13 +20,8 @@ public class ContainMatch implements MatchType {
             cache.spammySpacesRemovedNoRepeat = noRepeatChars(cache.spammySpacesRemoved);
         }
 
-        if (cache.spammySpacesRemovedNoRepeat.contains(snippet) ||
-                cache.spammySpacesRemoved.contains(snippet)) {
-            if (Censura.getCachedConfig().isLogDetections())
-                Censura.getPlugin().getLogger().info("Detected \""+snippet+"\" in phrase \""+message+"\" (Contain match)");
-            return true;
-        }
-        return false;
+        return cache.spammySpacesRemovedNoRepeat.contains(snippet) ||
+                cache.spammySpacesRemoved.contains(snippet);
     }
 
     private static String noRepeatChars(String string) {
@@ -41,5 +36,15 @@ public class ContainMatch implements MatchType {
             result.append(c);
         }
         return result.toString();
+    }
+
+    @Override
+    public String getSnippet() {
+        return snippet;
+    }
+
+    @Override
+    public String getType() {
+        return "contain";
     }
 }
