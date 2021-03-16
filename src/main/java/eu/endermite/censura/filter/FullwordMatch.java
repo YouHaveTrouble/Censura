@@ -56,6 +56,6 @@ public class FullwordMatch implements MatchType {
 
     @Override
     public String getType() {
-        return "regex";
+        return "fullword";
     }
 }
