@@ -17,6 +17,7 @@ public class BookEditListener implements Listener {
             for (String page : bookMeta.getPages()) {
                 if (Filter.filter(page, event.getPlayer())) {
                     event.setCancelled(true);
+                    return;
                 }
             }
         } catch (NullPointerException ignored) {}

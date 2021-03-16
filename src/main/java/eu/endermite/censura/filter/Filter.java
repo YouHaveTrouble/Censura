@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,16 +24,13 @@ public class Filter {
 
     public static boolean detect(String string, CachedConfig.FilterCategory filter) {
         string = preprocessString(string);
-
         List<MatchType> matches = filter.getMatches();
 
         FilterCache cache = new FilterCache();
         for (MatchType match : matches) {
-            if (match.match(string, cache)) {
+            if (match.match(string, cache))
                 return true;
-            }
         }
-
         return false;
     }
 
@@ -42,9 +38,8 @@ public class Filter {
         if (player.isOp() && Censura.getCachedConfig().getOpBypass())
             return false;
 
-        if (player.hasPermission("censura.bypass")) {
+        if (player.hasPermission("censura.bypass"))
             return false;
-        }
 
         for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
             if (detect(message, filter)) {
@@ -52,18 +47,15 @@ public class Filter {
                 return true;
             }
         }
-
         return false;
     }
 
     public static boolean filterNoActions(String message) {
 
         for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
-            if (detect(message, filter)) {
+            if (detect(message, filter))
                 return true;
-            }
         }
-
         return false;
     }
 
