@@ -20,17 +20,18 @@ public class CachedConfig {
     boolean opBypass, kickOnJoin, logDetections;
 
     public CachedConfig(FileConfiguration config) {
+        Censura plugin = Censura.getPlugin();
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed! No filter section found.");
-            Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
+            plugin.getLogger().severe("Configuration malformed! No filter section found.");
+            plugin.getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
 
         ConfigurationSection replacements = config.getConfigurationSection("replacements");
         if (replacements == null) {
-            Censura.getPlugin().getLogger().severe("Configuration malformed! No replacements section found or it is invalid: " + replacements);
-            Censura.getPlugin().getLogger().severe("Try deleting current config files and regenerating them.");
+            plugin.getLogger().severe("Configuration malformed! No replacements section found or it is invalid");
+            plugin.getLogger().severe("Try deleting current config files and regenerating them.");
             return;
         }
         replacementMap = new CharReplacementMap(replacements.getValues(false));
@@ -38,13 +39,18 @@ public class CachedConfig {
         Set<String> filterCategories = filter.getKeys(false);
         for (String filterCategory : filterCategories) {
             ConfigurationSection categorySection = filter.getConfigurationSection(filterCategory);
+            if (categorySection == null) {
+                plugin.getLogger().severe("Configuration malformed! No category section found or it is invalid: "+filterCategory);
+                plugin.getLogger().severe("Try deleting current config files and regenerating them.");
+                return;
+            }
 
             ArrayList<MatchType> matches = new ArrayList<>();
 
             List<?> matchList = categorySection.getList("match");
             if (matchList == null) {
-                Censura.getPlugin().getLogger().severe("Configuration malformed!");
-                Censura.getPlugin().getLogger().severe(filterCategory + " doesn't contain a match section.");
+                plugin.getLogger().severe("Configuration malformed!");
+                plugin.getLogger().severe(filterCategory + " doesn't contain a match section.");
                 return;
             }
 
@@ -57,22 +63,22 @@ public class CachedConfig {
                 } else if (matchObject instanceof Map) {
                     Map<?,?> map = (Map<?,?>)matchObject;
                     if (map.size() != 1) {
-                        Censura.getPlugin().getLogger().warning("Expected only one object in map. This usually means you forgot to add a '-' in front of a match.");
+                        plugin.getLogger().warning("Expected only one object in map. This usually means you forgot to add a '-' in front of a match.");
                     }
                     Map.Entry<?,?> entry = map.entrySet().stream().findFirst().orElseThrow(IllegalStateException::new);
 
                     if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
                         MatchType match = MatchType.fromString((String)entry.getValue(), (String)entry.getKey());
                         if (match == null) {
-                            Censura.getPlugin().getLogger().warning(entry.getValue() + " is not a valid type! Skipping...");
+                            plugin.getLogger().warning(entry.getValue() + " is not a valid type! Skipping...");
                         } else {
                             matches.add(match);
                         }
                     } else {
-                        Censura.getPlugin().getLogger().warning(matchObject + " in " + filterCategory + " does not contain strings.");
+                        plugin.getLogger().warning(matchObject + " in " + filterCategory + " does not contain strings.");
                     }
                 } else {
-                    Censura.getPlugin().getLogger().warning(matchObject + " in " + filterCategory + " is not a string nor a map. Instead it's a: " + matchObject.getClass().getSimpleName());
+                    plugin.getLogger().warning(matchObject + " in " + filterCategory + " is not a string nor a map. Instead it's a: " + matchObject.getClass().getSimpleName());
                 }
             }
 
@@ -89,6 +95,11 @@ public class CachedConfig {
         logDetections = config.getBoolean("log-detections", true);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
+        if (messages == null) {
+            plugin.getLogger().severe("Configuration malformed! No messages section found.");
+            plugin.getLogger().severe("Try deleting current config files and regenerating them.");
+            return;
+        }
         noPermission = messages.getString("no-permission", "Censura - &cYou don't have permission to do this.");
         noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
         configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
