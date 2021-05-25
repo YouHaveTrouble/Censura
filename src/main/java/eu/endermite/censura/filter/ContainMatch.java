@@ -1,6 +1,5 @@
 package eu.endermite.censura.filter;
 
-import eu.endermite.censura.Censura;
 import java.util.regex.Pattern;
 
 public class ContainMatch implements MatchType {
