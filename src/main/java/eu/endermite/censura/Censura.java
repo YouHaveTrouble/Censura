@@ -17,14 +17,6 @@ public final class Censura extends JavaPlugin {
         plugin = this;
         reloadConfigCache();
 
-        getServer().getPluginManager().registerEvents(new ChatEventListener(), this);
-        getServer().getPluginManager().registerEvents(new SignChangeListener(), this);
-        getServer().getPluginManager().registerEvents(new BookEditListener(), this);
-        getServer().getPluginManager().registerEvents(new ItemRenameListener(), this);
-        getServer().getPluginManager().registerEvents(new CommandListener(), this);
-        getServer().getPluginManager().registerEvents(new EntityRenameListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-
         try {
             getCommand("censura").setExecutor(new CensuraCommand());
             getCommand("censura").setTabCompleter(new CensuraCommand());
@@ -41,7 +33,7 @@ public final class Censura extends JavaPlugin {
     private void reloadConfigCache() {
         saveDefaultConfig();
         reloadConfig();
-        cachedConfig = new CachedConfig(getConfig());
+        cachedConfig = new CachedConfig();
     }
 
     public void asyncReloadConfigCache(CommandSender sender) {

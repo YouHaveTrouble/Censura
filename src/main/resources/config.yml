@@ -4,6 +4,15 @@ op-bypass: true
 # Should players be denied to join if their name contains bad words?
 kick-on-bad-name: true
 
+# Which events should be checked for bad words?
+checks:
+  chat: true
+  sign: true
+  book: true
+  command: true
+  anvil-name: true
+  nametag-use: true
+
 # Should detections that contain filtered words be logged in console
 log-detections: true
 

@@ -2,16 +2,21 @@ package eu.endermite.censura.config;
 
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.filter.MatchType;
+import eu.endermite.censura.listener.*;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class CachedConfig {
+    FileConfiguration config;
     List<FilterCategory> categories = new ArrayList<>();
     CharReplacementMap replacementMap;
     List<String> commandsToFilter = new ArrayList<>();
@@ -19,12 +24,36 @@ public class CachedConfig {
     String noPermission, noSuchCommand, configReloaded, kickBadName;
     boolean opBypass, kickOnJoin, logDetections;
 
-    public CachedConfig(FileConfiguration config) {
+    public CachedConfig() {
         Censura plugin = Censura.getPlugin();
+        this.config = plugin.getConfig();
+
+        // Unregister all listeners created by Censura
+        HandlerList.unregisterAll(plugin);
+
+        if (config.getBoolean("checks.chat", true))
+            registerListener(ChatEventListener.class);
+
+        if (config.getBoolean("checks.sign", true))
+            registerListener(SignChangeListener.class);
+
+        if (config.getBoolean("checks.book", true))
+            registerListener(BookEditListener.class);
+
+        if (config.getBoolean("checks.command", true))
+            registerListener(CommandListener.class);
+
+        if (config.getBoolean("checks.anvil-name", true))
+            registerListener(ItemRenameListener.class);
+
+        if (config.getBoolean("checks.nametag-use", true))
+            registerListener(EntityRenameListener.class);
+
+
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
-            plugin.getLogger().severe("Configuration malformed! No filter section found.");
-            plugin.getLogger().severe("Try deleting current config files and regenerating them.");
+            config.createSection("filter");
+            filter = config.getConfigurationSection("filter");
             return;
         }
 
@@ -41,8 +70,7 @@ public class CachedConfig {
             ConfigurationSection categorySection = filter.getConfigurationSection(filterCategory);
             if (categorySection == null) {
                 plugin.getLogger().severe("Configuration malformed! No category section found or it is invalid: "+filterCategory);
-                plugin.getLogger().severe("Try deleting current config files and regenerating them.");
-                return;
+                continue;
             }
 
             ArrayList<MatchType> matches = new ArrayList<>();
@@ -51,7 +79,7 @@ public class CachedConfig {
             if (matchList == null) {
                 plugin.getLogger().severe("Configuration malformed!");
                 plugin.getLogger().severe(filterCategory + " doesn't contain a match section.");
-                return;
+                continue;
             }
 
             // This is a list of either strings or maps
@@ -161,6 +189,16 @@ public class CachedConfig {
 
         public List<String> getPunishments() {
             return punishments;
+        }
+    }
+
+    private void registerListener(Class<?> clazz) {
+        try {
+            Censura plugin = Censura.getPlugin();
+            Listener listener = (org.bukkit.event.Listener) clazz.getConstructor().newInstance();
+            plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 }
