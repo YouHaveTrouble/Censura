@@ -25,6 +25,13 @@ filtered-commands:
   - say
   - me
 
+# filter messages based on characters they contain. If message contains characters not
+# present in regex, it will be cancelled.
+prefilter:
+  enabled: false
+  regex: [a-zA-z0-9\s;'.\/<>()!@#$%^&*|:"~+=\-_,?]+
+  failed: "Censura - Your input contained disallowed characters."
+
 # These characters are replaced by the character on the right before processing.
 replacements:
   '0': o

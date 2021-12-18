@@ -13,6 +13,16 @@ import java.util.regex.Pattern;
 public class Filter {
     private static final Pattern diacreticMarks = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
+    /**
+     * @param string String to check
+     * @return true if passed the prefilter
+     */
+    public static boolean preFilter(String string) {
+        String prefilter = Censura.getCachedConfig().getPrefilterRegex();
+        if (prefilter == null) return true;
+        return string.matches(prefilter);
+    }
+
     public static String preprocessString(String string) {
         String message = string.toLowerCase();
         message = Normalizer.normalize(message, Normalizer.Form.NFD);

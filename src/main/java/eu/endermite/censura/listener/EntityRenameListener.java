@@ -1,5 +1,6 @@
 package eu.endermite.censura.listener;
 
+import eu.endermite.censura.Censura;
 import eu.endermite.censura.filter.Filter;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -14,8 +15,13 @@ public class EntityRenameListener implements Listener {
 
         ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
 
-        if (handItem.getType() != Material.NAME_TAG)
+        if (handItem.getType() != Material.NAME_TAG) return;
+
+        if (!Filter.preFilter(handItem.getItemMeta().getDisplayName())) {
+            event.getPlayer().sendMessage(Censura.getCachedConfig().getPrefilterFailed());
+            event.setCancelled(true);
             return;
+        }
 
         if (Filter.filter(handItem.getItemMeta().getDisplayName(), event.getPlayer()))
             event.setCancelled(true);

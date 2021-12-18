@@ -21,7 +21,7 @@ public class CachedConfig {
     CharReplacementMap replacementMap;
     List<String> commandsToFilter = new ArrayList<>();
 
-    String noPermission, noSuchCommand, configReloaded, kickBadName;
+    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed;
     boolean opBypass, kickOnJoin, logDetections;
 
     public CachedConfig() {
@@ -54,6 +54,13 @@ public class CachedConfig {
         if (filter == null) {
             config.createSection("filter");
             filter = config.getConfigurationSection("filter");
+            return;
+        }
+
+        ConfigurationSection prefilter = config.getConfigurationSection("prefilter");
+        if (prefilter != null && prefilter.getBoolean("enabled", false)) {
+            prefilterRegex = prefilter.getString("regex");
+            prefilterFailed = prefilter.getString("failed", "Censura - Your input contained disallowed characters.");
             return;
         }
 
@@ -172,6 +179,14 @@ public class CachedConfig {
 
     public boolean isLogDetections() {
         return logDetections;
+    }
+
+    public String getPrefilterRegex() {
+        return prefilterRegex;
+    }
+
+    public String getPrefilterFailed() {
+        return ChatColor.translateAlternateColorCodes('&', prefilterFailed);
     }
 
     public static class FilterCategory {
