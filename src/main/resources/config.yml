@@ -44,6 +44,17 @@ replacements:
   '$': s
   '@': a
 
+# Check if the current chat message is similiar to the messages sent before
+similarity:
+  # Should feature be anabled?
+  enabled: false
+  # How many messages back to check
+  message-amount: 3
+  # Percentage of how similiar messages should be to be flagged as similar to previous ones
+  threshold: 80
+  actions:
+    - "message: Censura - Stop sending spammy messages, %player%!"
+
 ##### FILTERS
 # Filters are processed in order from top to bottom
 # You can have an unlimited number of filters.

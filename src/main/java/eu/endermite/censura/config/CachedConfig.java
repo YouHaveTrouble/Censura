@@ -20,9 +20,11 @@ public class CachedConfig {
     List<FilterCategory> categories = new ArrayList<>();
     CharReplacementMap replacementMap;
     List<String> commandsToFilter = new ArrayList<>();
+    List<String> similarCheckActions = new ArrayList<>();
 
     String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed;
     boolean opBypass, kickOnJoin, logDetections;
+    Integer similarMessageAmount, similarMessageThreshold;
 
     public CachedConfig() {
         Censura plugin = Censura.getPlugin();
@@ -49,19 +51,27 @@ public class CachedConfig {
         if (config.getBoolean("checks.nametag-use", true))
             registerListener(EntityRenameListener.class);
 
+        if (config.getBoolean("similarity.enabled", false)) {
+            registerListener(SimilarMessageListener.class);
+        }
 
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
             config.createSection("filter");
             filter = config.getConfigurationSection("filter");
-            return;
         }
 
         ConfigurationSection prefilter = config.getConfigurationSection("prefilter");
         if (prefilter != null && prefilter.getBoolean("enabled", false)) {
             prefilterRegex = prefilter.getString("regex");
             prefilterFailed = prefilter.getString("failed", "Censura - Your input contained disallowed characters.");
-            return;
+        }
+
+        ConfigurationSection similarity = config.getConfigurationSection("similarity");
+        if (similarity != null && similarity.getBoolean("enabled", false)) {
+            similarMessageAmount = similarity.getInt("message-amount", 3);
+            similarMessageThreshold = similarity.getInt("threshold", 80);
+            similarCheckActions = similarity.getStringList("actions");
         }
 
         ConfigurationSection replacements = config.getConfigurationSection("replacements");
@@ -187,6 +197,18 @@ public class CachedConfig {
 
     public String getPrefilterFailed() {
         return ChatColor.translateAlternateColorCodes('&', prefilterFailed);
+    }
+
+    public Integer getSimilarMessageAmount() {
+        return similarMessageAmount;
+    }
+
+    public Integer getSimilarMessageThreshold() {
+        return similarMessageThreshold;
+    }
+
+    public List<String> getSimilarCheckActions() {
+        return similarCheckActions;
     }
 
     public static class FilterCategory {
