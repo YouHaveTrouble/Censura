@@ -29,7 +29,7 @@ filtered-commands:
 # present in regex, it will be cancelled.
 prefilter:
   enabled: false
-  regex: [a-zA-z0-9\s;'.\/<>()!@#$%^&*|:"~+=\-_,?]+
+  regex: "[\\p{L}0-9\\s;.\\/<>()!@#$%^&*|:~+=\\-_,?\"'\\[\\]]+"
   failed: "Censura - Your input contained disallowed characters."
 
 # These characters are replaced by the character on the right before processing.
