@@ -46,17 +46,15 @@ public class Filter {
         FilterCache cache = new FilterCache();
         for (MatchType match : matches) {
             if (match.match(message, cache)) {
-                if (Censura.getCachedConfig().isLogDetections()) {
-                    if (player != null)
-                        alertMessage = String.format("Detected player `%s` stated `%s` in phrase `%s` (type: %s)", player.getName(), match.getSnippet(), message, match.getType());
-                    else
-                        alertMessage = String.format("Detected `%s` in phrase `%s` (type: %s)", match.getSnippet(), message, match.getType());
+                if (player != null)
+                    alertMessage = String.format("Detected player `%s` stated `%s` in phrase `%s` (type: %s)", player.getName(), match.getSnippet(), message, match.getType());
+                else
+                    alertMessage = String.format("Detected `%s` in phrase `%s` (type: %s)", match.getSnippet(), message, match.getType());
+                if (Censura.getCachedConfig().isLogDetections())
                     Censura.getPlugin().getLogger().info(alertMessage);
-                    if (Censura.getCachedConfig().isDiscord())
-                        Censura.getPlugin().getLogger().info("Sending discord trigger");
-                        sendWebhook(alertMessage);
-                }
-                    return true;
+                if (Censura.getCachedConfig().isDiscord())
+                    sendWebhook(alertMessage);
+                return true;
             }
         }
         return false;
@@ -106,8 +104,6 @@ public class Filter {
         DiscordWebhook webhook = new DiscordWebhook(Censura.getCachedConfig().getDiscordURL());
         webhook.setAvatarUrl(Censura.getCachedConfig().getDiscordAuthorAvatar());
         webhook.setUsername(Censura.getCachedConfig().getDiscordAuthor());
-
-        Censura.getPlugin().getLogger().info(Censura.getCachedConfig().getDiscordURL() + Censura.getCachedConfig().getDiscordAuthorAvatar() + Censura.getCachedConfig().getDiscordAuthor());
 
         EmbedObject embed = new EmbedObject()
                 .setTitle("Censure Alert")

@@ -18,7 +18,6 @@ checks:
 log-detections: true
 
 # Should detections be sent to a Discord webhook?
-# log-detections must be set to true
 discord-webhook:
   enabled: false
   webhook-url: "WEBHOOK"
