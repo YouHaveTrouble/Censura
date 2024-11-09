@@ -6,6 +6,7 @@ import eu.endermite.censura.listener.*;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -22,8 +23,8 @@ public class CachedConfig {
     List<String> commandsToFilter = new ArrayList<>();
     List<String> similarCheckActions = new ArrayList<>();
 
-    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed;
-    boolean opBypass, kickOnJoin, logDetections;
+    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed, discordWebhookUrl, discordAuthor, discordAuthorAvatar;
+    boolean opBypass, kickOnJoin, logDetections, discordEnabled;
     Integer similarMessageAmount, similarMessageThreshold;
 
     public CachedConfig() {
@@ -51,8 +52,18 @@ public class CachedConfig {
         if (config.getBoolean("checks.nametag-use", true))
             registerListener(EntityRenameListener.class);
 
+        if (config.getBoolean("checks.username", true))
+            registerListener(PlayerJoinListener.class);
+
         if (config.getBoolean("similarity.enabled", false)) {
             registerListener(SimilarMessageListener.class);
+        }
+
+        ConfigurationSection discord = config.getConfigurationSection("discord-webhook");
+        if (discord != null && discord.getBoolean("enabled", false)) {
+            discordWebhookUrl = discord.getString("webhook-url");
+            discordAuthor = discord.getString("webhook-author");
+            discordAuthorAvatar = discord.getString("webhook-author-avatar");
         }
 
         ConfigurationSection filter = config.getConfigurationSection("filter");
@@ -138,6 +149,7 @@ public class CachedConfig {
         opBypass = config.getBoolean("op-bypass", true);
         kickOnJoin = config.getBoolean("kick-on-bad-name", true);
         logDetections = config.getBoolean("log-detections", true);
+        discordEnabled = config.getBoolean( "discord-webhook.enabled", false);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
         if (messages == null) {
@@ -189,6 +201,20 @@ public class CachedConfig {
 
     public boolean isLogDetections() {
         return logDetections;
+    }
+
+    public boolean isDiscord() { return discordEnabled; }
+
+    public String getDiscordURL() {
+        return discordWebhookUrl;
+    }
+
+    public String getDiscordAuthor() {
+        return discordAuthor;
+    }
+
+    public String getDiscordAuthorAvatar() {
+        return discordAuthorAvatar;
     }
 
     public String getPrefilterRegex() {
