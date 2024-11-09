@@ -12,9 +12,18 @@ checks:
   command: true
   anvil-name: true
   nametag-use: true
+  username: true
 
 # Should detections that contain filtered words be logged in console
 log-detections: true
+
+# Should detections be sent to a Discord webhook?
+# log-detections must be set to true
+discord-webhook:
+  enabled: false
+  webhook-url: "WEBHOOK"
+  webhook-author: "Censura"
+  webhook-author-avatar: "https://cdn.modrinth.com/data/1bHrk3Qj/fc8befa6db65ff97f878f6a47f124135a0a11b0f.jpeg"
 
 # Commands of which arguments should be checked.
 # It's recommended to list all private message commands and their aliases
