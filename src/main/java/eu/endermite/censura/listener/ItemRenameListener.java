@@ -23,8 +23,9 @@ public class ItemRenameListener implements Listener {
 
         if (event.getSlot() != 2) return;
 
-        AnvilInventory anvil = (AnvilInventory)inv;
-        Player player = (Player)event.getWhoClicked();
+        AnvilInventory anvil = (AnvilInventory) inv;
+        Player player = (Player) event.getWhoClicked();
+        if (anvil.getRenameText() == null) return;
 
         if (!Filter.preFilter(anvil.getRenameText())) {
             event.getWhoClicked().sendMessage(Censura.getCachedConfig().getPrefilterFailed());
