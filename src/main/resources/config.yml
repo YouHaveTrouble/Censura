@@ -16,17 +16,20 @@ checks:
 # Should detections that contain filtered words be logged in console
 log-detections: true
 
+# Should detections that contain filtered words be sent to players
+notify-detections: true
+
 # Commands of which arguments should be checked.
 # It's recommended to list all private message commands and their aliases
-# and every command that allows changing item name and etc.
+# and every command that allows changing item name etc.
 filtered-commands:
   - msg
   - w
   - say
   - me
 
-# filter messages based on characters they contain. If message contains characters not
-# present in regex, it will be cancelled.
+# filter messages based on characters they contain. If a message contains characters not
+# present in regex, it will be canceled.
 prefilter:
   enabled: false
   regex: "[\\p{L}0-9\\s;.\\/<>()!@#$%^&*|:~+=\\-_,?\"'\\[\\]]+"
@@ -44,13 +47,15 @@ replacements:
   '$': s
   '@': a
 
-# Check if the current chat message is similiar to the messages sent before
+# Check if the current chat message is similar to the messages sent before
 similarity:
-  # Should feature be anabled?
+  # Should the feature be enabled?
   enabled: false
-  # How many messages back to check
-  message-amount: 3
-  # Percentage of how similiar messages should be to be flagged as similar to previous ones
+  # How many previous messages to check
+  messages-to-check: 3
+  # Minimum number of similar previous messages required to block
+  max-similar-messages: 1
+  # Percentage of how similar messages should be to be flagged as similar to previous ones
   threshold: 80
   actions:
     - "message: Censura - Stop sending spammy messages, %player%!"
@@ -114,3 +119,10 @@ messages:
   no-such-command: "Censura - &cThere is no such command."
   config-reloaded: "Censura - &aConfiguration reloaded."
   kick-bad-name: "Censura\n&cYour name contains bad words!"
+  # Placeholders: %player%, %message%, %snippet%, %check%
+  detection: "&c%player% &7wrote &4\"%message%\" &7containing: &4\"%snippet%\" &7in: &c%check%"
+  notification-enabled: "Censura - &aNotification enabled."
+  notification-disabled: "Censura - &cNotification disabled."
+  notification-status: "Censura - &7Your notifications are currently %status%&7."
+  notification-status-enabled: "&aenabled"
+  notification-status-disabled: "&cdisabled"

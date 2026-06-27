@@ -2,6 +2,7 @@ package eu.endermite.censura.listener;
 
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.filter.Filter;
+import eu.endermite.censura.notification.CheckType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,7 +17,7 @@ public class PlayerJoinListener implements Listener {
             return;
 
         String name = event.getPlayerProfile().getName();
-        if (Filter.filterNoActions(name)) {
+        if (Filter.filterNoActions(name, name, CheckType.PLAYER_NAME)) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Censura.getCachedConfig().getKickBadName());
             event.setKickMessage(Censura.getCachedConfig().getKickBadName());
         }

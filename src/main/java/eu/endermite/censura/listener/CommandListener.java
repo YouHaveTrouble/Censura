@@ -2,6 +2,7 @@ package eu.endermite.censura.listener;
 
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.filter.Filter;
+import eu.endermite.censura.notification.CheckType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,7 +20,7 @@ public class CommandListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                if (Filter.filter(msg, event.getPlayer())) {
+                if (Filter.filter(msg, event.getPlayer(), CheckType.COMMAND)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -28,4 +29,3 @@ public class CommandListener implements Listener {
         }
     }
 }
-

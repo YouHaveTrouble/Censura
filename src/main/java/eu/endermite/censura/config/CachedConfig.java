@@ -22,9 +22,11 @@ public class CachedConfig {
     List<String> commandsToFilter = new ArrayList<>();
     List<String> similarCheckActions = new ArrayList<>();
 
-    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed;
-    boolean opBypass, kickOnJoin, logDetections;
-    Integer similarMessageAmount, similarMessageThreshold;
+    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed, detectionMessage,
+        notificationEnabled, notificationDisabled, notificationStatus, notificationStatusEnabled, notificationStatusDisabled;
+    boolean opBypass, kickOnJoin, logDetections, notifyDetections;
+
+    Integer similarMessagesToCheck, similarMaxMessages, similarMessageThreshold;
 
     public CachedConfig() {
         Censura plugin = Censura.getPlugin();
@@ -32,6 +34,12 @@ public class CachedConfig {
 
         // Unregister all listeners created by Censura
         HandlerList.unregisterAll(plugin);
+
+        kickOnJoin = config.getBoolean("kick-on-bad-name", true);
+
+        // Register flood first so that it filters potential staff notification flooding
+        if (config.getBoolean("similarity.enabled", false))
+            registerListener(SimilarMessageListener.class);
 
         if (config.getBoolean("checks.chat", true))
             registerListener(ChatEventListener.class);
@@ -51,9 +59,8 @@ public class CachedConfig {
         if (config.getBoolean("checks.nametag-use", true))
             registerListener(EntityRenameListener.class);
 
-        if (config.getBoolean("similarity.enabled", false)) {
-            registerListener(SimilarMessageListener.class);
-        }
+        if (kickOnJoin)
+            registerListener(PlayerJoinListener.class);
 
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
@@ -69,7 +76,14 @@ public class CachedConfig {
 
         ConfigurationSection similarity = config.getConfigurationSection("similarity");
         if (similarity != null && similarity.getBoolean("enabled", false)) {
-            similarMessageAmount = similarity.getInt("message-amount", 3);
+            similarMessagesToCheck = similarity.getInt("messages-to-check", 3);
+            similarMaxMessages = similarity.getInt("max-similar-messages", 1);
+
+            if (similarMaxMessages > similarMessagesToCheck) {
+                plugin.getLogger().warning("max-similar-messages cannot be greater than messages-to-check. Adjusting automatically.");
+                similarMaxMessages = similarMessagesToCheck;
+            }
+
             similarMessageThreshold = similarity.getInt("threshold", 80);
             similarCheckActions = similarity.getStringList("actions");
         }
@@ -136,8 +150,8 @@ public class CachedConfig {
 
         commandsToFilter.addAll(config.getStringList("filtered-commands"));
         opBypass = config.getBoolean("op-bypass", true);
-        kickOnJoin = config.getBoolean("kick-on-bad-name", true);
         logDetections = config.getBoolean("log-detections", true);
+        notifyDetections = config.getBoolean("notify-detections", true);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
         if (messages == null) {
@@ -149,6 +163,12 @@ public class CachedConfig {
         noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
         configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
         kickBadName = messages.getString("kick-bad-name", "Censura\n&cYour name contains bad words!");
+        detectionMessage = messages.getString("detection", "&c%player% &7wrote &4\"%message%\" &7containing: &4\"%snippet%\" &7in: &c%check%");
+        notificationEnabled = messages.getString("notification-enabled", "Censura - &aNotification enabled.");
+        notificationDisabled = messages.getString("notification-disabled", "Censura - &cNotification disabled.");
+        notificationStatus = messages.getString("notification-status", "Censura - &7Your notifications are currently %status%&7.");
+        notificationStatusEnabled = messages.getString("notification-status-enabled", "&aenabled");
+        notificationStatusDisabled = messages.getString("notification-status-disabled", "&cdisabled");
     }
 
     public List<FilterCategory> getCategories() {
@@ -179,6 +199,23 @@ public class CachedConfig {
         return ChatColor.translateAlternateColorCodes('&', kickBadName);
     }
 
+    public String getDetectionMessage() {
+        return ChatColor.translateAlternateColorCodes('&', detectionMessage);
+    }
+
+    public String getNotificationEnabled() {
+        return ChatColor.translateAlternateColorCodes('&', notificationEnabled);
+    }
+
+    public String getNotificationDisabled() {
+        return ChatColor.translateAlternateColorCodes('&', notificationDisabled);
+    }
+
+    public String getNotificationStatus(boolean enabled) {
+        String status = enabled ? notificationStatusEnabled : notificationStatusDisabled;
+        return ChatColor.translateAlternateColorCodes('&', notificationStatus.replace("%status%", status));
+    }
+
     public boolean getOpBypass() {
         return opBypass;
     }
@@ -191,6 +228,10 @@ public class CachedConfig {
         return logDetections;
     }
 
+    public boolean shouldNotifyDetections() {
+        return notifyDetections;
+    }
+
     public String getPrefilterRegex() {
         return prefilterRegex;
     }
@@ -199,8 +240,12 @@ public class CachedConfig {
         return ChatColor.translateAlternateColorCodes('&', prefilterFailed);
     }
 
-    public Integer getSimilarMessageAmount() {
-        return similarMessageAmount;
+    public Integer getSimilarMessagesToCheck() {
+        return similarMessagesToCheck;
+    }
+
+    public Integer getSimilarMaxMessages() {
+        return similarMaxMessages;
     }
 
     public Integer getSimilarMessageThreshold() {

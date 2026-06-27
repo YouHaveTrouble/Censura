@@ -8,8 +8,9 @@ public class PlayerChatHistory {
 
     public void addMessage(String string) {
         if (Censura.getCachedConfig().getSimilarMessageThreshold() == null) return;
-        if (Censura.getCachedConfig().getSimilarMessageAmount() == null) return;
-        if (messageHistory.size() >= Censura.getCachedConfig().getSimilarMessageAmount()) {
+        if (Censura.getCachedConfig().getSimilarMessagesToCheck() == null) return;
+        if (Censura.getCachedConfig().getSimilarMaxMessages() == null) return;
+        if (messageHistory.size() >= Censura.getCachedConfig().getSimilarMessagesToCheck()) {
             messageHistory.remove(0);
         }
         messageHistory.add(string);

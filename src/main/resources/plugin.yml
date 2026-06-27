@@ -14,3 +14,11 @@ permissions:
   censura.bypass:
     default: false
     description: Allows to bypass filters of Censura
+  censura.notifications:
+    default: op
+    description: Allows receiving staff notifications
+  censura.notifications.toggle:
+    default: op
+    description: Allows changing notification settings
+    children:
+      censura.notifications: true
