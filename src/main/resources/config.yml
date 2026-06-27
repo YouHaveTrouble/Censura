@@ -123,3 +123,6 @@ messages:
   detection: "&c%player% &7wrote &4\"%message%\" &7containing: &4\"%snippet%\" &7in: &c%check%"
   notification-enabled: "Censura - &aNotification enabled."
   notification-disabled: "Censura - &cNotification disabled."
+  notification-status: "Censura - &7Your notifications are currently %status%&7."
+  notification-status-enabled: "&aenabled"
+  notification-status-disabled: "&cdisabled"

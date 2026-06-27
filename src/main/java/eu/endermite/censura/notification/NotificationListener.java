@@ -14,7 +14,7 @@ public class NotificationListener implements Listener {
 
     @EventHandler
     public void handlePlayerJoin(PlayerJoinEvent event) {
-        if (event.getPlayer().hasPermission("censura.notify")) {
+        if (event.getPlayer().hasPermission("censura.notifications")) {
             staffNotification.addStaff(event.getPlayer());
         }
     }

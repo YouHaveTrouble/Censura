@@ -23,7 +23,7 @@ public class CachedConfig {
     List<String> similarCheckActions = new ArrayList<>();
 
     String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed, detectionMessage,
-        notificationEnabled, notificationDisabled;
+        notificationEnabled, notificationDisabled, notificationStatus, notificationStatusEnabled, notificationStatusDisabled;
     boolean opBypass, kickOnJoin, logDetections, notifyDetections;
 
     Integer similarMessagesToCheck, similarMaxMessages, similarMessageThreshold;
@@ -166,6 +166,9 @@ public class CachedConfig {
         detectionMessage = messages.getString("detection", "&c%player% &7wrote &4\"%message%\" &7containing: &4\"%snippet%\" &7in: &c%check%");
         notificationEnabled = messages.getString("notification-enabled", "Censura - &aNotification enabled.");
         notificationDisabled = messages.getString("notification-disabled", "Censura - &cNotification disabled.");
+        notificationStatus = messages.getString("notification-status", "Censura - &7Your notifications are currently %status%&7.");
+        notificationStatusEnabled = messages.getString("notification-status-enabled", "&aenabled");
+        notificationStatusDisabled = messages.getString("notification-status-disabled", "&cdisabled");
     }
 
     public List<FilterCategory> getCategories() {
@@ -206,6 +209,11 @@ public class CachedConfig {
 
     public String getNotificationDisabled() {
         return ChatColor.translateAlternateColorCodes('&', notificationDisabled);
+    }
+
+    public String getNotificationStatus(boolean enabled) {
+        String status = enabled ? notificationStatusEnabled : notificationStatusDisabled;
+        return ChatColor.translateAlternateColorCodes('&', notificationStatus.replace("%status%", status));
     }
 
     public boolean getOpBypass() {

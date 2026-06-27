@@ -37,7 +37,7 @@ public class StaffNotification {
         staffNotify.clear();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("censura.notify")) {
+            if (player.hasPermission("censura.notifications")) {
                 staffNotify.add(player);
             }
         }
