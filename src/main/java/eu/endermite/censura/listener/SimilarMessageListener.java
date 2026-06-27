@@ -31,6 +31,8 @@ public class SimilarMessageListener implements Listener {
             return;
         }
 
+        if (Filter.isExempt(event.getPlayer())) return;
+
         int threshold = Censura.getCachedConfig().getSimilarMessageThreshold();
         int maxSimilar = Censura.getCachedConfig().getSimilarMaxMessages();
 
