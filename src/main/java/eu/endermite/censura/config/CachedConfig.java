@@ -22,7 +22,7 @@ public class CachedConfig {
     List<String> commandsToFilter = new ArrayList<>();
     List<String> similarCheckActions = new ArrayList<>();
 
-    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed,
+    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed, detectionMessage,
         notificationEnabled, notificationDisabled;
     boolean opBypass, kickOnJoin, logDetections, notifyDetections;
 
@@ -163,6 +163,7 @@ public class CachedConfig {
         noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
         configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
         kickBadName = messages.getString("kick-bad-name", "Censura\n&cYour name contains bad words!");
+        detectionMessage = messages.getString("detection", "&c%player% &7wrote &4\"%message%\" &7containing: &4\"%snippet%\" &7in: &c%check%");
         notificationEnabled = messages.getString("notification-enabled", "Censura - &aNotification enabled.");
         notificationDisabled = messages.getString("notification-disabled", "Censura - &cNotification disabled.");
     }
@@ -193,6 +194,10 @@ public class CachedConfig {
 
     public String getKickBadName() {
         return ChatColor.translateAlternateColorCodes('&', kickBadName);
+    }
+
+    public String getDetectionMessage() {
+        return ChatColor.translateAlternateColorCodes('&', detectionMessage);
     }
 
     public String getNotificationEnabled() {

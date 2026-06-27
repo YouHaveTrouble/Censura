@@ -119,5 +119,7 @@ messages:
   no-such-command: "Censura - &cThere is no such command."
   config-reloaded: "Censura - &aConfiguration reloaded."
   kick-bad-name: "Censura\n&cYour name contains bad words!"
+  # Placeholders: %player%, %message%, %snippet%, %check%
+  detection: "&c%player% &7wrote &4\"%message%\" &7containing: &4\"%snippet%\" &7in: &c%check%"
   notification-enabled: "Censura - &aNotification enabled."
   notification-disabled: "Censura - &cNotification disabled."

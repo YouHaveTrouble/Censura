@@ -39,7 +39,7 @@ public class Filter {
 
         String notificationMessage = null;
         if (Censura.getCachedConfig().isLogDetections() || Censura.getCachedConfig().shouldNotifyDetections())
-            notificationMessage = createMessageToLog(match, message, suspectName, checkType);
+            notificationMessage = createMessageToLog(match.getSnippet(), message, suspectName, checkType.toString());
 
         if (Censura.getCachedConfig().isLogDetections())
             Censura.getPlugin().getLogger().info(ChatColor.stripColor(notificationMessage));
@@ -106,12 +106,11 @@ public class Filter {
         return player.hasPermission("censura.bypass");
     }
 
-    public static String createMessageToLog(MatchType match, String message, String suspectName, CheckType checkType) {
-        return String.format("§c%s §7wrote §4\"%s\" §7containing: §4\"%s\" §7in: §c%s",
-                suspectName,
-                message,
-                match.getSnippet(),
-                checkType.toString()
-        );
+    public static String createMessageToLog(String snippet, String message, String suspectName, String checkType) {
+        return Censura.getCachedConfig().getDetectionMessage()
+                .replace("%check%", checkType)
+                .replace("%player%", suspectName)
+                .replace("%snippet%", snippet)
+                .replace("%message%", message);
     }
 }
